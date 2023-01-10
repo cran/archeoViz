@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Vignette archeoViz (fr)</title>
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Vignette archeoViz (fr)</h1>
+
+
+
+<p><code>archeoViz</code> est une application dédiée à l’archéologie. Elle permet de <em>visualiser</em>, d’<em>explorer</em> interactivement, et d’exposer et <em>communiquer</em> rapidement sur le web des données archéologiques de terrain. Elle propose des <em>visualisations</em> en 3D et 2D, génère des <em>coupes</em> et des <em>cartes</em> des restes archéologiques, permet de réaliser des <em>statistiques spatiales</em> simples (enveloppes convexes, surfaces de régression, estimation de densité par noyau en 2D), et de visualiser une <em>chronologie</em> interactive des fouilles d’un site. <code>archeoViz</code> peut être utilisée localement ou déployée sur un serveur, soit en chargeant des données via l’interface, soit en lançant l’application avec un jeu de donnée spécifique. L’interface est disponible en anglais et en français.</p>
+<ul>
+<li><a href="#installation"><strong>Installation</strong></a>
+<ul>
+<li><a href="#locale">Locale</a></li>
+<li><a href="#déployée">Déployée</a></li>
+<li><a href="#démonstration">Démonstration</a></li>
+</ul></li>
+<li><a href="#recommandations-communautaires"><strong>Recommandations communautaires</strong></a>
+<ul>
+<li><a href="#signaler-un-bug">Signaler un bug</a></li>
+<li><a href="#soumettre-une-modification">Soumettre une modification</a></li>
+</ul></li>
+<li><a href="#utilisation"><strong>Utilisation</strong></a>
+<ul>
+<li><a href="#données">Données</a>
+<ul>
+<li><a href="#par-chargement-de-tableaux">Par chargement de tableaux</a></li>
+<li><a href="#par-génération-de-données-aléatoires">Par génération de données aléatoires</a></li>
+<li><a href="#par-paramétrage-de-la-fonction">Par paramétrage de la fonction</a></li>
+</ul></li>
+<li><a href="#sous-sélection-de-données">Sous-sélection de données</a>
+<ul>
+<li><a href="#par-mode-de-localisation">Par mode de localisation</a></li>
+<li><a href="#par-catégorie-dobjet">Par catégorie d’objet</a></li>
+<li><a href="#sous-groupes-de-données">Sous-groupes de données</a></li>
+<li><a href="#par-objet">Par objet</a></li>
+</ul></li>
+<li><a href="#visualisations-interactives">Visualisations interactives</a></li>
+<li><a href="#sorties-graphiques">Sorties graphiques</a></li>
+<li><a href="#statistiques-spatiales">Statistiques spatiales</a>
+<ul>
+<li><a href="#surfaces-de-régression">Surfaces de régression</a></li>
+<li><a href="#enveloppes-convexes">Enveloppes convexes</a></li>
+<li><a href="#estimation-2d-de-densité-par-noyau">Estimation 2D de densité par noyau</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#références"><strong>Références</strong></a></li>
+</ul>
+<div id="installation" class="section level1">
+<h1>Installation</h1>
+<p><code>archeoViz</code> peut être employée de deux manières:</p>
+<ul>
+<li>localement, sur la machine de l’utilisateur</li>
+<li>à distance, après déploiement sur un serveur distant</li>
+</ul>
+<div id="locale" class="section level2">
+<h2>Locale</h2>
+<p>Le package peut être installé depuis GitHub avec:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co"># install.packages(&quot;devtools&quot;)</span></a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;sebastien-plutniak/archeoviz&quot;</span>)</a></code></pre></div>
+<p>Puis, chargez le package et lancez l’application avec:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(archeoViz)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="kw">archeoViz</span>()</a></code></pre></div>
+</div>
+<div id="déployée" class="section level2">
+<h2>Déployée</h2>
+<p>Pour déployer <code>archeoViz</code> sur votre Shiny server, téléchargez premièrement le package:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co"># déterminez le répertoire de travail dans votre shiny server:</span></a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="kw">setwd</span>(<span class="dt">dir =</span> <span class="st">&quot;/some/path/&quot;</span>)</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co"># téléchargez le package:</span></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="kw">download.file</span>(<span class="dt">url =</span> <span class="st">&quot;https://github.com/sebastien-plutniak/archeoviz/archive/master.zip&quot;</span>,</a>
+<a class="sourceLine" id="cb3-5" data-line-number="5">              <span class="dt">destfile =</span> <span class="st">&quot;archeoviz.zip&quot;</span>)</a>
+<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co"># décompression:</span></a>
+<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="kw">unzip</span>(<span class="dt">zipfile =</span> <span class="st">&quot;archeoviz.zip&quot;</span>)</a></code></pre></div>
+<p>Puis, rendez-vous à <code>https://&lt;your-shiny-server&gt;/archeoviz-main</code>.</p>
+<p>Pour paramétrer l’application avec vos données et préférences, éditez le fichier app.R situé à la racine du répertoire de l’application:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">archeoViz</span>(<span class="dt">objects.df =</span> <span class="ot">NULL</span>,   <span class="co"># data.frame pour les objets</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">          <span class="dt">refits.df =</span> <span class="ot">NULL</span>,    <span class="co"># data.frame optionnel pour les remontages</span></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">          <span class="dt">timeline.df =</span> <span class="ot">NULL</span>,  <span class="co"># data.frame optionnel pour la chronologie des fouilles</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4">          <span class="dt">title =</span> <span class="ot">NULL</span>,        <span class="co"># titre du site / du jeu de données</span></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5">          <span class="dt">home.text =</span> <span class="ot">NULL</span>,    <span class="co"># contenu html à afficher sur la page d'accueil</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6">          <span class="dt">lang =</span> <span class="st">&quot;fr&quot;</span>          <span class="co"># langue de l'interface (&quot;English&quot; ou &quot;French&quot;)</span></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7">          <span class="dt">set.theme =</span> <span class="st">&quot;cosmo&quot;</span>) <span class="co"># thème graphique de l'interface Shiny</span></a></code></pre></div>
+<p>Les valeurs possibles pour le paramètre <code>set.theme</code> sont illustrées sur <a href="https://rstudio.github.io/shinythemes/">cette page</a>. La langue de l’application peut être définie avec le paramètre <code>lang</code>, qui accepte les valeurs “en”/“English” ou “fr”/“French”.</p>
+</div>
+<div id="démonstration" class="section level2">
+<h2>Démonstration</h2>
+<p>Des instances de démonstration de l’application sont déployées sur le Shiny server d’<em>Huma Num</em>:</p>
+<ul>
+<li><a href="https://analytics.huma-num.fr/archeoviz/fr"><code>archeoViz</code> en Français</a>.</li>
+<li><a href="https://analytics.huma-num.fr/archeoviz/en"><code>archeoViz</code> en Anglais</a>.</li>
+</ul>
+<p>Pour un cas d’emploi réel, voir l’exemple de la grotte préhistorique du <a href="https://analytics.huma-num.fr/Sebastien.Plutniak/poeymau/">Poeymaü</a> dans les Pyrénées (N.B. il s’agit dans ce cas d’une version modifiée de l’application <code>archeoViz</code>).</p>
+</div>
+</div>
+<div id="recommandations-communautaires" class="section level1">
+<h1>Recommandations communautaires</h1>
+<div id="signaler-un-bug" class="section level2">
+<h2>Signaler un bug</h2>
+<p>Si vous rencontrez un bug, ouvrez une <a href="https://github.com/sebastien-plutniak/archeoviz/issues">issue</a> en indiquant tous les détails nécessaires pour le reproduire.</p>
+</div>
+<div id="suggérer-un-changement" class="section level2">
+<h2>Suggérer un changement</h2>
+<p>Les suggestions de modifications sont bienvenues. Les demandes peuvent concerner des fonctions additionnelles, des modifications dans la documentation, des exemples additionnels, de nouvelles fonctionnalités, etc. Elles peuvent être faite en ouvrant une <a href="https://github.com/sebastien-plutniak/archeoviz/issues">issue</a> ou, mieux encore, en employant une <em>pull requests</em> et le modèle GitHub <a href="https://docs.github.com/articles/about-pull-requests">Fork and Pull</a>.</p>
+</div>
+</div>
+<div id="utilisation" class="section level1">
+<h1>Utilisation</h1>
+<p>Considérant les restes archéologiques d’un site donné, <code>archeoViz</code> est conçu pour réduire les freins techniques à la réalisation de trois objectifs:</p>
+<ul>
+<li>l’exploration spatiale basique et la production de documents graphiques analytiques;</li>
+<li>la pré-publication rapide de données archéologiques, à destination de la communauté scientifique;</li>
+<li>le déploiement aisé d’un outil d’exposition et de communication, à destination d’un plus large public.</li>
+</ul>
+<p>N.B.: par conséquent, <code>archeoViz</code> n’t pas destiné à se substituer à des outils d’analyse plus sophistiqués (e.g., SIG, packages statistiques, etc.)</p>
+<div id="données" class="section level2">
+<h2>Données</h2>
+<p>Il existe trois manières d’introduire des données dans <code>archeoViz</code>:</p>
+<ol style="list-style-type: decimal">
+<li>en chargeant des tableaux à partir de l’onglet “Données”,</li>
+<li>en employant le générateur de données aléatoire dans l’onglet “Données”;</li>
+<li>en paramétrant la fonction <code>archeoViz</code> avant de lancer l’application.</li>
+</ol>
+<div id="par-chargement-de-tableaux" class="section level3">
+<h3>Par chargement de tableaux</h3>
+<p>Des tableaux pour trois types de données peuvent être chargés à partir de l’onglet “Données”:</p>
+<ul>
+<li>un tableau “objects” (requis), à propos des objets;</li>
+<li>un tableau “refits” (optionnel), à propos des relations de remontage;</li>
+<li>un tableau “timeline” (optionnel), à propos des carrés du site et des années où ils ont été fouillés.</li>
+</ul>
+<p>Les tableaux doivent être au format .csv et la première ligne doit contenir les noms des variables (le symbole séparateur du csv peut être défini dans l’interface). Plus de détails à propos des formats et des colonnes sont donnés dans l’onglet “Données”.</p>
+</div>
+<div id="par-génération-de-données-aléatoires" class="section level3">
+<h3>Par génération de données aléatoires</h3>
+<p>À des fins de démonstration, il est possible d’employer des données aléatoirement générées. Déplacer le curseur sur une valeur supérieure à 0, dans l’onglet “Données”, active cette fonctionnalité (replacer le curseur sur 0 la désactive). Des données d’objets, de remontage, et de chronologie de la fouille sont alors générés, permettant de tester toutes les fonctionnalités d’<code>archeoViz</code>.</p>
+</div>
+<div id="par-paramétrage-de-la-fonction" class="section level3">
+<h3>Par paramétrage de la fonction</h3>
+<p>La fonction de lancement d’<code>archeoViz()</code> peut être exécutée sans définir de paramètres:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">archeoViz</span>()</a></code></pre></div>
+<p>ou en employant les paramètres <code>objects.df</code>, <code>refits.df</code>, <code>timeline.df</code> afin de charger des données relatives, respectivement, aux objets, aux remontages, et à la chronologie.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">archeoViz</span>(<span class="dt">objects.df =</span> <span class="ot">NULL</span>,  <span class="co"># data.frame pour les objets</span></a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">          <span class="dt">refits.df =</span> <span class="ot">NULL</span>,   <span class="co"># data.frame optionnel pour les remontages</span></a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">          <span class="dt">timeline.df =</span> <span class="ot">NULL</span>) <span class="co"># data.frame optionnel pour la chronologie</span></a></code></pre></div>
+</div>
+</div>
+<div id="sous-sélection-de-données" class="section level2">
+<h2>Sous-sélection de données</h2>
+<p>Après que les données soient chargées, des sous-sélection peuvent être réalisées en employant les options du menu gauche de l’interface. Plusieurs paramètres sont possibles: le mode de localisation, les catégories des objets, et la définition de sous-groupes de données.</p>
+<div id="par-mode-de-localisation" class="section level3">
+<h3>Par mode de localisation</h3>
+<p>La localisation des objets archéologiques peut avoir été enregistrée de différentes manières, plus ou moins précises: comme des points (coordonnées xyz), sur des lignes, des plans, ou au sein de volumes (intervalles de valeurs x, y et/ou z). Dans <code>archeoViz</code>, une distinction est faite entre les localisations exactes (les points) et les autres types de localisations vagues (lignes, plans, volumes). Les boutons permettent de sélectionner le sous-ensemble de données correspondant à l’un, l’autre, ou les deux modes de localisation.</p>
+</div>
+<div id="par-catégorie-dobjet" class="section level3">
+<h3>Par catégorie d’objet</h3>
+<p>Des sous-ensembles de données peuvent être définis à partir des catégories des objets, en employant les champs “Variable” et “Valeurs”. Après que l’une des variables ait été sélectionnée (“object_type” ou une autre “object_” variable possible), ses valeurs apparaissent en dessous et peuvent être sélectionnées en cochant les items. La sélection doit être validée en cliquant sur le bouton “Valider”. Cette sélection détermine les données qui seront présentées dans les graphiques et tableaux.</p>
+</div>
+<div id="sous-groupes-de-données" class="section level3">
+<h3>Sous-groupes de données</h3>
+<p>Il est, de plus, possible de préciser si les couleurs doivent être définies en fonction des couches ou en fonction de la variable objet sélectionnée.</p>
+<p>Des sous-groupes de données peuvent être définies de deux manières: soit par couche ou en fonction de la variable “object_” sélectionnée. Cette option détermine l’application des couleurs dans les graphiques 3D et 2D et les sous-groupes de données auxquels sont appliqués les calculs de surface de régression et d’enveloppes convexes.</p>
+</div>
+<div id="par-objet" class="section level3">
+<h3>Par objet</h3>
+<p>Enfin, dans l’onglet “Vue 3D”, cliquer sur un point active l’affichage d’information à son sujet dans le tableau présent sous la visualisation.</p>
+</div>
+</div>
+<div id="visualisations-interactives" class="section level2">
+<h2>Visualisations interactives</h2>
+<p>Les visualisations dans les onglets “Vue 3D”, “Carte”, “Section X” et “Section Y” sont générées à l’aide de la librairie <a href="https://CRAN.R-project.org/package=plotly/"><code>plotly</code></a>. Toutes ces visualisations sont dynamiques et sont surmontées d’une barre de menu comportant plusieurs options (générer un fichier image, zoomer, déplacer le point de vue, etc.). Davantage de détails sont disponibles sur le <a href="http://plotly.github.io/getting-to-know-the-plotly-modebar/">site de plotly</a>.</p>
+<p>Cliquer sur un item de la légende modifie l’affichage:</p>
+<ul>
+<li>un simple click sur un item active/désactive son affichage;</li>
+<li>un double click sur un item limite l’affichage à cet item seul (un autre double click annule cette sélection).</li>
+</ul>
+<p>Cette fonctionnalité permet de définir les couches devant être affichées. De plus, la taille des points peut être ajustée, ainsi que l’affichage ou non des relations de remontage.</p>
+</div>
+<div id="sorties-graphiques" class="section level2">
+<h2>Sorties graphiques</h2>
+<p>Plusieurs sorties graphiques peuvent être générées dans <code>archeoViz</code>.</p>
+<ul>
+<li>Toutes les visualisations générées avec <code>plotly</code> comportent une fonction d’exportation en format .svg.</li>
+<li>le plan des fouilles (dans l’onglet “Chronologie”) peut être téléchargé au format .svg en cliquant sur le bouton en dessous.</li>
+</ul>
+</div>
+<div id="statistiques-spatiales" class="section level2">
+<h2>Statistiques spatiales</h2>
+<p><code>archeoViz</code> comporte quelques fonctionnalités d’analyse spatiale, destinées à usage simple et exploratoire.</p>
+<div id="surfaces-de-régression" class="section level3">
+<h3>Surfaces de régression</h3>
+<p>Dans l’onglet “Vue 3D”, cliquer sur “Calculer les surfaces” puis “Valider” affiche les surfaces de régression associées à chaque sous-ensemble de points (couche), comportant au moins 100 points. Les surfaces sont calculées grâce au modèle additif généralisé implémenté dans le package <a href="https://CRAN.R-project.org/package=mgcv"><code>mgcv</code></a>.</p>
+</div>
+<div id="enveloppes-convexes" class="section level3">
+<h3>Enveloppes convexes</h3>
+<p>Cliquer sur “Calculer les enveloppes” puis “Valider”, dans l’onglet “Vue 3D”, affiche les enveloppes convexes associées à chaque sous-ensemble de points (couches), comportant au moins 20 points. Les enveloppes sont calculées en employant le package <a href="https://CRAN.R-project.org/package=cxhull"><code>cxhull</code></a>.</p>
+</div>
+<div id="estimation-2d-de-densité-par-noyau" class="section level3">
+<h3>Estimation 2D de densité par noyau</h3>
+<p>Dans l’onglet “Plan”, cocher la case “Calculer la densité” et cliquer sur “Valider” génère un plan comportant des lignes de contour représentant la densité des points. La densité peut être calculée pour l’ensemble des points ou par couche (comportant au moins 30 points). L’estimation bidimensionnelle de densité par noyau est calculée avec la fonction <code>kde2d</code> du package <a href="https://CRAN.R-project.org/package=MASS"><code>MASS</code></a> (à travers le package <a href="https://CRAN.R-project.org/package=ggplot2"><code>ggplot2</code></a>).</p>
+</div>
+</div>
+</div>
+<div id="références" class="section level1">
+<h1>Références</h1>
+<ul>
+<li>Plutniak, Sébastien. 2023. “archeoViz. Visualisation, Exploration, and Web Communication of Archaeological Excavation Data”. v0.2.1, DOI: <a href="https://doi.org/10.5281/zenodo.7512526">10.5281/zenodo.7512526</a>.</li>
+</ul>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
