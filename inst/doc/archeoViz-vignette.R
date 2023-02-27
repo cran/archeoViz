@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 #            timeline.df = NULL,  # optional data.frame for the excavation timeline
 #            title = NULL,        # title of the site / data set
 #            home.text = NULL,    # html content to display on the home page
-#            lang = "en"          # interface language (English or French)
+#            lang = "en"          # interface language ("en": English, "fr": French, "it": Italian, "pt": Portuguese)
 #            set.theme = "cosmo") # graphic theme for the Shiny interface
 
 ## ---- eval=FALSE--------------------------------------------------------------
@@ -30,4 +30,37 @@ knitr::opts_chunk$set(
 #  archeoViz(objects.df = NULL,  # data.frame with data about the objects
 #            refits.df = NULL,   # data.frame for refitting objects
 #            timeline.df = NULL) # optional data.frame for the excavation timeline
+
+## ---- eval=FALSE--------------------------------------------------------------
+#  archeoViz(objects.df=NULL, refits.df=NULL, timeline.df=NULL,
+#            title=NULL, home.text=NULL, lang="en", set.theme="cosmo",
+#            square.size = 100, reverse.axis.values = NULL, reverse.square.names = NULL,
+#            add.x.square.labels = NULL, add.y.square.labels = NULL,
+#            class.variable = NULL, class.values = NULL,
+#            default.group = "by.layer", location.mode = NULL,
+#            map.z.val = NULL, map.density = "no", map.refits = NULL,
+#            plot3d.hulls = NULL, plot3d.surfaces = NULL, plot3d.refits = NULL,
+#            sectionX.x.val = NULL, sectionX.y.val = NULL, sectionX.refits = NULL,
+#            sectionY.x.val = NULL, sectionY.y.val = NULL, sectionY.refits = NULL,
+#            camera.center = NULL, camera.eye = NULL, run.plots = FALSE
+#            )
+
+## ---- eval=FALSE--------------------------------------------------------------
+#  archeoViz(square.size = 100,
+#            reverse.axis.values = NULL, reverse.square.names = NULL,
+#            add.x.square.labels = NULL, add.y.square.labels = NULL
+#            )
+
+## ---- eval=FALSE--------------------------------------------------------------
+#  archeoViz(class.variable = NULL, class.values = NULL,
+#  		  default.group = "by.layer", location.mode = NULL,
+#  		  map.z.val = NULL, map.density = "no", map.refits = NULL,
+#  		  plot3d.hulls = NULL, plot3d.surfaces = NULL, plot3d.refits = NULL,
+#  		  sectionX.x.val = NULL, sectionX.y.val = NULL, sectionX.refits = NULL,
+#  		  sectionY.x.val = NULL, sectionY.y.val = NULL, sectionY.refits = NULL,
+#  		  camera.center = NULL, camera.eye = NULL
+#            )
+
+## ---- eval=FALSE--------------------------------------------------------------
+#  archeoViz(run.plots = FALSE)
 

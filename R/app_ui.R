@@ -30,10 +30,10 @@ ui <- shinyUI(
           tabPanel(.term_switcher("tab.input"), # Input data ----
                    column(12, align="left",
                           br(),
-                          h2(.term_switcher("header.objects.table")),
+                          h2(.term_switcher("header.simul.data")),
                           sliderInput("demoData.n", .term_switcher("use.demo"),
                                        value = 0, min = 0, max=10000, step=100),
-                          "or",
+                          h2(.term_switcher("header.objects.table")),
                           fluidRow(
                             column(4, fileInput('objects.file', .term_switcher("choose.csv"),
                                                 accept=c('text/csv', 'text/comma-separated-values, text/plain'))
@@ -104,21 +104,22 @@ ui <- shinyUI(
           tabPanel(.term_switcher("tab.plot3d"), # 3D plot ----
                    fluidRow(
                      column(10,
-                            plotly::plotlyOutput("plot3d",  width = 800, height = 650),
-                            uiOutput("id.table")
+                            plotly::plotlyOutput("plot3d",  width = "100%", height = 650),
+                            uiOutput("id.table"), 
                      ),
                      column(2,
                             br(),
-                            actionButton("goButton3D", .term_switcher("view")),
+                            actionButton("goButton3D", .term_switcher("refresh")),
                             br(),
                             h4(.term_switcher("header.3d.options")),
                             uiOutput("show.surfaces"),
-                            checkboxInput("cxhull", .term_switcher("hulls"), value = F),
+                            checkboxInput("cxhull", .term_switcher("hulls"),
+                                          value = getShinyOption("params")$cxhull ),
                             uiOutput("show.refits"),
                             sliderInput("point.size", .term_switcher("point.size"), width="100%", sep = "",
                                         min=1, max=5, value=2, step=1),
-                            sliderInput("ratio", .term_switcher("ratio"), width="100%", sep = "",
-                                        min=.5, max=2, value=1, step=.1)
+                            uiOutput("ratio3D"), 
+                            downloadButton("download.3d.plot", .term_switcher("download"))
                      )  # end column
                    )  # end fluid row
           ),      #end tabPanel
@@ -131,13 +132,13 @@ ui <- shinyUI(
                      ),
                      column(2,
                             br(),
-                            actionButton("goButtonZ", .term_switcher("view")),
+                            actionButton("goButtonZ", .term_switcher("refresh")),
                             br(), br(),
                             uiOutput("density_selector"),
+                            uiOutput("show.refits.map"),
                             sliderInput("map.point.size", .term_switcher("point.size"),
                                         width="100%", sep = "",
                                         min=1, max=10, value=2, step=1),
-                            uiOutput("show.refits.map"),
                             )#end column
                    ) #end fluid row
           ), # end tabPanel
@@ -149,18 +150,18 @@ ui <- shinyUI(
                             uiOutput("sliderYy")
                      ),
                      column(1,
-                            br(), actionButton("goButtonY", .term_switcher("view")))
+                            br(), actionButton("goButtonY", .term_switcher("refresh")))
                    ),
                    fluidRow(
                      column(9,
                             plotly::plotlyOutput("sectionYplot", width = "100%", height = 500)
                      ),
                      column(3,
+                            uiOutput("show.refits.sectionY"),
                             sliderInput("sectionY.point.size", .term_switcher("point.size"),
                                         width="100%", sep = "",
                                         min=1, max=10, value=5, step=1),
-                            uiOutput("show.refits.sectionY"),
-                            imageOutput("site.mapY", width = "250px", height = "250px")
+                            plotOutput("site.mapY")
                      )
                    )#end fluidrow
           ), # end tabPanel
@@ -172,18 +173,18 @@ ui <- shinyUI(
                             uiOutput("sliderXy")
                      ),
                      column(1, br(),
-                            actionButton("goButtonX", .term_switcher("view")),)
+                            actionButton("goButtonX", .term_switcher("refresh")),)
                    ),
                    fluidRow(
                      column(9,
                             plotly::plotlyOutput("sectionXplot", width = "100%", height = 500)
                      ),
                      column(3,
+                            uiOutput("show.refits.sectionX"),
                             sliderInput("sectionX.point.size", .term_switcher("point.size"),
                                         width="100%", sep = "",
                                         min=1, max=10, value=5, step=1),
-                            uiOutput("show.refits.sectionX"),
-                            imageOutput("site.mapX", width = "250px", height = "250px")
+                            plotOutput("site.mapX")
                      )
                    ) #end fluidrow
           ), # end tabPanel
@@ -207,17 +208,31 @@ ui <- shinyUI(
                      column(7,
                             imageOutput("timeline.map", width = "100%", height = "500px")),
                      column(5,
-                            imageOutput("timeline.map.grid", width = "100%", height = "400px")),
+                            imageOutput("timeline.map.grid", width = "100%", height = "400px"),
+                            downloadButton("download.timeline.map", .term_switcher("download"))),
                    ), #end fluidrow
-                   br(),
-                   downloadButton("download.timeline.map", "Download map (svg)"),
           ), #end tabPanel
-
-          tabPanel(.term_switcher("tab.guidelines"), # Guidelines ----
+        
+        tabPanel(.term_switcher("tab.reproducibility"), # Reproducibility ----
+                 column(12, align="center",
+                        br(),
+                          HTML(paste("<div style=width:40%;, align=left>",
+                                     .term_switcher("reproducibility"),
+                                     "<br><div style=\"font-family:Courier; width:100%;\", align=left>",
+                                       htmlOutput("reproducibility"),
+                                  "</div>",
+                                "</div>"
+                        ) # end paste
+                        )  # end HTML
+                 ) # end column
+        ), #end tabPanel
+        
+        tabPanel(.term_switcher("tab.guidelines"), # Guidelines ----
                column(12, align="left",
                       tags$div(
                         HTML(paste("<div style=width:70%;, align=left>",
-                       .term_switcher("guidelines")
+                       .term_switcher("guidelines"),
+                       "</div>"
                           ))# end HTML
                          )# end div
                        ) # end column

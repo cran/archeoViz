@@ -1,6 +1,7 @@
 .do_section_plot <- function(selection, dataset, section.point.size,
                              refitting.df, show.refits, 
-                             colors, grid.coord, coords, axis.labels, xaxis){
+                             colors, grid.coord, coords, axis.labels, xaxis,
+                             reverse.axis.values=""){
    # data check: ----
   section.df <- dataset[selection, ]
 
@@ -24,9 +25,10 @@
 
   # add config ----
   section <- plotly::config(section,
+                            displaylogo = FALSE,
                             toImageButtonOptions = list(
                               format = "svg",
-                              filename = "section",
+                              filename = "archeoviz-section",
                               width = 600, height = 600
                               ))
   # add points ----
@@ -52,29 +54,48 @@
   # add refits ----
   if(! is.null(show.refits)){
   if(show.refits){
+    
     refitting.df <- refitting.df()
+    refitting.df <- refitting.df$refits.2d
+    
     # subset refitting data set:
-    sel <- (refitting.df[, 1] %in% section.df$id) | (refitting.df[, 2] %in% section.df$id)
+    sel <- (refitting.df[, 1] %in% section.df$id) & (refitting.df[, 2] %in% section.df$id)
     refitting.df <- refitting.df[which(sel), ]
 
     # define values for the x axis:
     refitting.df$x  <- eval(parse(text = paste0("refitting.df$", xaxis)))
+    refitting.df$xend  <- eval(parse(text = paste0("refitting.df$", xaxis, "end")))
 
-    section <- plotly::add_paths(section, x = ~x, y = ~z,
-                          split = ~id,
-                          data = refitting.df,
-                          color = I("red"), showlegend=F,
-                          line = list(width=1),
-                          hoverinfo = "skip",
-                          inherit = F)
+    section <- plotly::add_segments(section,
+                                    x = ~x, xend = ~xend,
+                                    y = ~z, yend = ~zend,
+                                 data = refitting.df,
+                                 color = I("red"), showlegend=F,
+                                 line = list(width=1),
+                                 hoverinfo = "skip",
+                                 inherit = F)
   }
 }
   # add layout ----
+  
+  xrange <- c(eval(parse(text = paste0("coords$", xaxis, "min"))),
+              eval(parse(text = paste0("coords$", xaxis, "max"))))
+  
+  if( grepl("x", reverse.axis.values) & xaxis == "x" ){
+    xrange <- c(eval(parse(text = paste0("coords$", xaxis, "max"))),
+                eval(parse(text = paste0("coords$", xaxis, "min"))))
+  }
+  if( grepl("y", reverse.axis.values) & xaxis == "y" ){
+    xrange <- c(eval(parse(text = paste0("coords$", xaxis, "max"))),
+                eval(parse(text = paste0("coords$", xaxis, "min"))))
+  }
+  
   section <- plotly::layout(section,
+                     paper_bgcolor = getShinyOption("background.col"), 
+                     plot_bgcolor =  getShinyOption("background.col"),
                      xaxis = list(title = toupper(xaxis),
                                   zeroline = FALSE,
-                                  range= c(eval(parse(text = paste0("coords$", xaxis, "min"))),
-                                           eval(parse(text = paste0("coords$", xaxis, "max")))),
+                                  range = xrange,
                                   tickvals = eval(parse(text = paste0("axis.labels$", xaxis, "axis$breaks"))),
                                   ticktext = eval(parse(text = paste0("axis.labels$", xaxis, "axis$labels")))
                      ),
@@ -83,7 +104,7 @@
                                   range = c(coords$zmax, coords$zmin),
                                   scaleanchor="x"
                      )
-  )
+                     )
   
   section
 }

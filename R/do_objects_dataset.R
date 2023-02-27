@@ -1,4 +1,6 @@
-.do_objects_dataset <- function(from.func.objects.df=NULL, demoData.n=NULL, input.ui.table=NULL){
+.do_objects_dataset <- function(from.func.objects.df=NULL, demoData.n=NULL,
+                                input.ui.table=NULL, 
+                                add.x.square.labels=NULL, add.y.square.labels=NULL){
   # source selection ----
   if (! is.null(from.func.objects.df)){
     df <- from.func.objects.df
@@ -42,7 +44,14 @@
                 notif.text = "notif.error.identifier",
                 notif.type = "error"))
   }
-
+  
+  
+  # Objects ----
+  df$object_type <- as.character(df$object_type)
+  # sanitize column names:
+  idx <- grep("object_", colnames(df))
+  colnames(df)[idx] <- gsub("[\\*\\/\\-\\+]", ".", colnames(df)[idx], perl=TRUE)
+  
   # Coordinates ----
   # : clean empty coordinates values
   df[which(df$xmin %in% c("", " ")), "xmin"] <- NA
@@ -63,26 +72,36 @@
   if(is.null(df$zmax)){ df$zmax <- df$zmin }
   
   # : location mode ----
-  df[, "location_mode"] <- .term_switcher("exact")
+  df[, "location_mode"] <- "exact"
   
   # : generate random coordinates if needed ----
-  location.term <- .term_switcher("fuzzy")
+  location.term <- "fuzzy"
   df <- .coordinates_sampling(df, "xmin", "xmax", "x", location.term)
   df <- .coordinates_sampling(df, "ymin", "ymax", "y", location.term)
   df <- .coordinates_sampling(df, "zmin", "zmax", "z", location.term)
+  
+  # : add a string summary of the coordinates: ----
+  df$xyz <- paste0(round(df$x, 1), ", ", round(df$y, 1), ", ", round(df$z, 1))
   
   # Squares ----
   if( ! (is.null(df$square_x) & is.null(df$square_y)) ){
     # : add square identifier ----
     # : as factors ----
-    df$square_x <- factor(df$square_x)
-    df$square_y <- factor(df$square_y)
+    df$square_x <- factor(df$square_x, exclude = c(NA, "", " "))
+    df$square_y <- factor(df$square_y, exclude = c(NA, "", " "))
+    df$square_x <- factor(df$square_x,
+                    levels = sort(c(levels(df$square_x), add.x.square.labels)))
+    df$square_y <- factor(df$square_y,
+                    levels = sort(c(levels(df$square_y), add.y.square.labels)))
     df$square <- paste(df$square_x, df$square_y, sep = "-")
+    
   } else{
     df$square_x <- NULL
     df$square_y <- NULL
     df$square <- ""
   }
+  
+  
   
   # Layers ----
   # : order by mean depth ----

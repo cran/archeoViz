@@ -17,9 +17,11 @@ knitr::opts_chunk$set(
 #  archeoViz(objects.df = NULL,   # data.frame pour les objets
 #            refits.df = NULL,    # data.frame optionnel pour les remontages
 #            timeline.df = NULL,  # data.frame optionnel pour la chronologie des fouilles
+#            default.group =NULL, # méthode de groupement des données,
+#                                 # par couche ("by.layer") ou "by.variable"
 #            title = NULL,        # titre du site / du jeu de données
 #            home.text = NULL,    # contenu html à afficher sur la page d'accueil
-#            lang = "fr"          # langue de l'interface ("English" ou "French")
+#            lang = "fr"          # langue de l'interface ("en": Anglais, "fr": Français, "it": Italien "pt": Portugais)
 #            set.theme = "cosmo") # thème graphique de l'interface Shiny
 
 ## ---- eval=FALSE--------------------------------------------------------------
@@ -29,4 +31,37 @@ knitr::opts_chunk$set(
 #  archeoViz(objects.df = NULL,  # data.frame pour les objets
 #            refits.df = NULL,   # data.frame optionnel pour les remontages
 #            timeline.df = NULL) # data.frame optionnel pour la chronologie
+
+## ---- eval=FALSE--------------------------------------------------------------
+#  archeoViz(objects.df=NULL, refits.df=NULL, timeline.df=NULL,
+#            title=NULL, home.text=NULL, lang="en", set.theme="cosmo",
+#            square.size = 100, reverse.axis.values = NULL, reverse.square.names = NULL,
+#            add.x.square.labels = NULL, add.y.square.labels = NULL,
+#            class.variable = NULL, class.values = NULL,
+#            default.group = "by.layer", location.mode = NULL,
+#            map.z.val = NULL, map.density = "no", map.refits = NULL,
+#            plot3d.hulls = NULL, plot3d.surfaces = NULL, plot3d.refits = NULL,
+#            sectionX.x.val = NULL, sectionX.y.val = NULL, sectionX.refits = NULL,
+#            sectionY.x.val = NULL, sectionY.y.val = NULL, sectionY.refits = NULL,
+#            camera.center = NULL, camera.eye = NULL, run.plots = FALSE
+#            )
+
+## ---- eval=FALSE--------------------------------------------------------------
+#  archeoViz(square.size = 100,
+#            reverse.axis.values = NULL, reverse.square.names = NULL,
+#            add.x.square.labels = NULL, add.y.square.labels = NULL
+#            )
+
+## ---- eval=FALSE--------------------------------------------------------------
+#  archeoViz(class.variable = NULL, class.values = NULL,
+#  		  default.group = "by.layer", location.mode = NULL,
+#  		  map.z.val = NULL, map.density = "no", map.refits = NULL,
+#  		  plot3d.hulls = NULL, plot3d.surfaces = NULL, plot3d.refits = NULL,
+#  		  sectionX.x.val = NULL, sectionX.y.val = NULL, sectionX.refits = NULL,
+#  		  sectionY.x.val = NULL, sectionY.y.val = NULL, sectionY.refits = NULL,
+#  		  camera.center = NULL, camera.eye = NULL
+#            )
+
+## ---- eval=FALSE--------------------------------------------------------------
+#  archeoViz(run.plots = FALSE)
 
