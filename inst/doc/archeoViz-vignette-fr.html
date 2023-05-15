@@ -466,7 +466,35 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li>un tableau “refits” (optionnel), à propos des relations de remontage;</li>
 <li>un tableau “timeline” (optionnel), à propos des carrés du site et des années où ils ont été fouillés.</li>
 </ul>
-<p>Les tableaux doivent être au format .csv et la première ligne doit contenir les noms des variables (le symbole séparateur du csv peut être défini dans l’interface). Plus de détails à propos des formats et des colonnes sont donnés dans l’onglet “Données”.</p>
+<p>Les tableaux doivent être au format .csv et la première ligne doit contenir les noms des variables (le symbole séparateur du csv peut être défini dans l’interface). Les contenus au format html sont autorisés. Cela permet notamment d’introduire références vers des ressources complémentaires du jeu de données (par .ex l’identifiant unique de l’objets dans une autre base de données, ou ceux des concepts d’ontologies employés pour décrire l’objet, etc.).</p>
+<div id="tableau-objets" class="section level4">
+<h4>Tableau objets</h4>
+<p>Chaque ligne décrit un objet et doit comporter les variables obligatoires suivantes :</p>
+<ul>
+<li><strong>id</strong> : <em>valeur alphanumérique</em>, identifiant unique de l’objet</li>
+<li><strong>xmin</strong> : <em>valeur numérique</em>, coordonnée de l’objet en axe X (en cm)</li>
+<li><strong>ymin</strong> : <em>valeur numérique</em>, coordonnée de l’objet en axe Y (en cm)</li>
+<li><strong>zmin</strong> : <em>valeur numérique</em>, coordonnée de l’objet en axe Z (valeur positive de profondeur en cm)</li>
+<li><strong>layer</strong> : <em>valeur alphanumérique</em>, identifiant de la couche de l’objet</li>
+<li><strong>object_type</strong> : <em>valeur alphanumérique</em>, catégorie de l’objet</li>
+</ul>
+<p>De plus, des variables optionnelles sont possibles:</p>
+<ul>
+<li><strong>square_x</strong> : <em>valeur alphanumérique</em>, identifiant du carré de l’objet en axe X</li>
+<li><strong>square_y</strong> : <em>valeur alphanumérique</em>, identifiant du carré de l’objet en axe Y</li>
+<li><strong>year</strong> : <em>valeur numérique</em>, année de fouille de l’objet</li>
+<li><strong>xmax</strong> : <em>valeur numérique</em>, lorsque la localisation de l’objet en X est comprise dans un intervalle de coordonnées</li>
+<li><strong>ymax</strong> : <em>valeur numérique</em>, lorsque la localisation de l’objet en Y est comprise dans un intervalle de coordonnées</li>
+<li><strong>zmax</strong> : <em>valeur numérique</em>, lorsque la localisation de l’objet en Z est comprise dans un intervalle de coordonnées</li>
+<li><strong>object_edit</strong> : nombre non limité de variables additionnelles décrivant l’objet (les noms de colonnes doivent commencer par <em>object_</em> et avoir des suffixes différents</li>
+</ul>
+<p>Les labels des carrés du carroyage :</p>
+<ul>
+<li>sont ordonnés alpha-numériquement ;</li>
+<li>ne sont pas affichés, afin d’éviter des affichages erronés, si le nombbre de labels ne correspond pas exactement au nombre total de carrés de 100 cm pouvant être définis dans l’intervalle des coordonnées minimales et maximales contenues dans les variables xmin et ymin ;</li>
+<li>peuvent être complétés avec les paramètres <code>add.x.square.labels</code> et <code>add.y.square.labels</code> de la fonction <code>archeoViz()</code> afin d’ajouter les labels manquants (respectivement, sur les axes X et Y du carroyage).</li>
+</ul>
+</div>
 </div>
 <div id="par-génération-de-données-aléatoires" class="section level3">
 <h3>Par génération de données aléatoires</h3>
@@ -500,7 +528,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="par-objet" class="section level3">
 <h3>Par objet</h3>
-<p>Enfin, dans l’onglet “Vue 3D”, cliquer sur un point active l’affichage d’information à son sujet dans le tableau présent sous la visualisation.</p>
+<p>Dans les onglets “Vue 3D”, “Carte”, “Section X” et “Section Y”, cliquer sur un point active l’affichage d’informations à son sujet dans le tableau présent sous la visualisation.</p>
 </div>
 </div>
 <div id="remontages" class="section level2">
@@ -531,8 +559,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h2>Sorties graphiques</h2>
 <p>Plusieurs sorties graphiques peuvent être générées dans <code>archeoViz</code>.</p>
 <ul>
-<li>Les visualisations en 3D, en plan et en sections comportent une fonction d’export graphique en format .svg (accessible en cliquant sur l’icône “appareil photo” de la barre de menu s’affichant au dessus des visualisations).</li>
-<li>La visualisation 3D peut être exportée en format html interactif en cliquant sur le bouton “Télécharger”.</li>
+<li>Les visualisations en 3D, en plan et en sections peuvent être exportées :
+<ul>
+<li>au format .svg, en cliquant sur l’icône “appareil photo” de la barre de menu s’affichant au dessus des visualisations ;</li>
+<li>en format html interactif, en cliquant sur le bouton “Exporter” dans la colonne droite de l’interface.</li>
+</ul></li>
 <li>Le plan de la chronologie des fouilles peut être téléchargé au format .svg en cliquant sur le bouton “Télécharger”.</li>
 </ul>
 </div>
@@ -644,6 +675,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1>Références</h1>
 <ul>
 <li>Plutniak, Sébastien, Renata Araujo, Sara Giardino. 2023. “archeoViz. Visualisation, Exploration, and Web Communication of Archaeological Excavation Data”. v1.0.0, DOI: <a href="https://doi.org/10.5281/zenodo.7682227">10.5281/zenodo.7682227</a>.</li>
+<li>Plutniak, Sébastien. 2023. “<a href="https://www.prehistoire.org/offres/doc_inline_src/515/0-BSPF_2023_1_2e_partie_Correspondance_PLUTNIAK.pdf">Visualiser et explorer la distribution spatiale du mobilier archéologique: l’application archeoViz et son portail web</a>”. <strong>Bulletin de la Société préhistorique française</strong>, 120(1), p. 70-74.</li>
 </ul>
 </div>
 

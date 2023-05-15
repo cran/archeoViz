@@ -2,24 +2,37 @@
 
 # archeoviz
 
-* revoir la structure de l'arborescence sur le serveur huma-num, en utilisant le parametre path de load_all() pour n'avoir qu'une copie du package
+## bugs 
+* bug dans la génération des svg pour les profils (les lignes qui délimitent la figure sont décalées)
+* revoir timeline, qui bloque à cause d'un if(from.ui.timeline) dans do_process_timeline()  
+* Densité 2D : erreurs occasionnelles lorsqu'impossibilité de générer les courbes de densité
+* Timeline : interface FR, traduire "year"
+
+## simple enhancements
+
+* faire que dans le plan, la valeur de la variable de groupement sélectionnée s'affiche lors du hover
 * bouton Lancer / Rafraîchir
-* Problème : lorsque changement de variable, les plots de section se mettent à jour (le plot 3D et le plan ne se mettent pas à jour, comme attendu)
-* ajouter dans la doc le fonctionnement des numerotations de carrés : ils doivent :
-	* suivre un ordre alpha numérique
-	* si le nbre de label de carré ne correspond exactement au nombre total de carrés pouvant être défini à partir des coordonnées, les labels de carrés ne sont pas affichés (pour éviter un affiachage erroné)
-	  Toutefois, les paramètres add.x.square.labels et add.y.square.labels permettent d'ajouter les labels manquants (qui seront positionnés par ordre alphanumérique)
 * add test for reverse.axis.values et  reverse.square.names
 * passer la definition des squares dans une fonction .do_square_list() et ajouter des tests
 * améliorer les labels pour les adapter lors de la représentation de grandes surfaces
-* add an error or default layer value if empty layer
-* revoir timeline, qui bloque à cause d'un if(from.ui.timleine) dans do_process_timeline()  
-* rendre les minimaps téléchargeables
+* ajouter le téléchargement en widget des sections et du plan
+
+## new features
+
+* visualiser les incertitudes de positionnement, proposer 3 cases à cocher: 
+	"exact"
+	"vague"
+	"afficher les incertitudes"  (TODO :remplacer "exacte ou vague")
+* créer outil de formatage de tableau au format adapté à archeoViz
 * rendre possible le rearrangement des labels de carré : square_x, square_x_order, square_y, square_y_order
-
-
-* perspective interfaçage / openarcheo ou nkala: faire qu'il soit possible de lancer avec un url une instance archeoviz mettant en evidence un objet.
-	(idéee : un convertiesseur tranforme l'url et ses parametrs en commande archeoviz()  adaptée avec les paramètres)
+* permettre de plotter les surfaces (suggestion D Giusti) 
+* calculer des surfaces d'interface entre couches
+* interfaçage / openarcheo ou nakala: faire qu'il soit possible de lancer avec un url une instance archeoviz mettant en evidence un objet.
+	(idée : un convertisseur tranforme l'url et ses parametres en commande archeoviz()  adaptée avec les paramètres)
+* integrer 3 types d'enregistrement 
+	* par carré, carroyage 
+	* coordonnée absolues
+	* coordonnées UTM
 
 DONE:
 * voir  package explor : pour export des parametres courant d'une appli shiny
@@ -28,11 +41,11 @@ DONE:
 	
 	
 # portal
-
+* revoir la structure de l'arborescence sur le serveur huma-num, en utilisant le parametre path de load_all() pour n'avoir qu'une copie du package
 * ajouter une rubrique “variables” (type et description), voir l'exemple de tDAR, récupérant les données dans le tableau metadata.csv
 	soit 1 colonne par variable (contenant alors les 3 champs : name, type, description)
 	soit 3 colonnes par variable (Column Name,	Data Type, description)
-* indexation periodo + geonames pour els communes
+* indexation periodo + geonames pour les communes
 * marquer le site sélectionné par une forme différente
 
 * envisager la gestion d'intervalles de dates : 
@@ -46,10 +59,10 @@ DONE:
 
 ## Méthode pour remontages
 
-Deux cas de figure :
+Deux cas de figure sont à distinguer dans les données produites par les archéologues :
 
-1. les remontages physiques sont documentés (par paire de fragments)
-2. les remontages sont documentés par ensembles de fragments joins (sans préciser quel fragment remonte avec quel fragment)
+1. les remontages physiques sont documentés explicitement (les relations de connexité entre fragments sont documentées par des paires d'identifiants de framents)
+2. les remontages sont documentés par ensembles de fragments joins (sans préciser les relations de connexité entre fragments)
 
 Deux variables sont à documenter dans le tableau metadata.csv
 * n.refits : nombre de relations de remontage physiques (paires de fragments)

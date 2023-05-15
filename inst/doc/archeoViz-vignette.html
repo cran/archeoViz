@@ -464,7 +464,35 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li>a “refits” table (optional), with data about the refitting objects;</li>
 <li>a “timeline” table (optional), with data about when each square of the site was excavated.</li>
 </ul>
-<p>The tables must be .csv files with the first row used containing the columns’ labels (the separator can be set). More details about the required formats and columns are provided in the “Input data” tab.</p>
+<p>The tables must be .csv files with the first row used containing the columns’ labels (the separator can be set). Contents in html are allowed. This makes possible, in particular, to add links to external resources (e.g., the permanent identifier of the object’s in other databases, or of the concepts used to describe the object, etc.).</p>
+<div id="objects-table" class="section level4">
+<h4>Objects table</h4>
+<p>A row describes a single object with the following mandatory fields:</p>
+<ul>
+<li><strong>id</strong>: <em>alphanumerical value</em>, unique identifier of the object</li>
+<li><strong>xmin</strong>: <em>numerical value</em>, coordinate of the object on the X axis (in cm)</li>
+<li><strong>ymin</strong>: <em>numerical value</em>, coordinate of the object on the Y axis (in cm)</li>
+<li><strong>zmin</strong>: <em>numerical value</em>, coordinate of the object on the Z axis (positive depth value in cm)</li>
+<li><strong>layer</strong>: <em>alphanumerical value</em>, identifier of the object’s layer</li>
+<li><strong>object_type</strong>: <em>alphanumerical value</em>, category of the object</li>
+</ul>
+<p>In addition, optional fields are possible, including:</p>
+<ul>
+<li><strong>square_x</strong>: <em>alphanumerical value</em>, identifier of the square on the X axis</li>
+<li><strong>square_y</strong>: <em>alphanumerical value</em>, identifier of the square on the Y axis</li>
+<li><strong>year</strong> : <em>numerical value</em>, year when the object was excavated</li>
+<li><strong>xmax</strong>: <em>numerical value</em>, when the X location of the object is included in a range of X coordinates</li>
+<li><strong>ymax</strong>: <em>numerical value</em>, when the Y location of the object is included in a range of Y coordinates</li>
+<li><strong>zmax</strong>: <em>numerical value</em>, when the Z location of the object is included in a range of Z coordinates</li>
+<li><strong>object_edit</strong>: unlimited number of additional variable describing the object (field names must start with <code>object_</code> and have different suffixes)</li>
+</ul>
+<p>The labels of the squares of the grid:</p>
+<ul>
+<li>are ordered alpha-numerically;</li>
+<li>are not displayed, in order to avoid erroneous displays, if the number of labels does not correspond exactly to the total number of 100 cm squares that can be defined in the range of minimum and maximum coordinates contained in the xmin and ymin variables;</li>
+<li>can be completed with the <code>add.x.square.labels</code> and <code>add.y.square.labels</code> parameters of the <code>archeoViz()</code> function in order to add the missing labels (on the X and Y axes of the grid, respectively).</li>
+</ul>
+</div>
 </div>
 <div id="random-data" class="section level3">
 <h3>Random data</h3>
@@ -497,7 +525,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="objects-selection" class="section level3">
 <h3>Objects selection</h3>
-<p>In the “3D plot” tab, clicking on a point displays information about that point in the table below the plot.</p>
+<p>In the “3D plot”, “Map”, “Section X”, and “Section Y” tabs, clicking on a point displays information about that point in the table below the plot.</p>
 </div>
 </div>
 <div id="interactive-visualisation" class="section level2">
@@ -514,8 +542,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h2>Graphical outputs</h2>
 <p>Several graphical outputs can be generated in <code>archeoViz</code>.</p>
 <ul>
-<li>The 3D visualisation, the map and the section visualisation can all be exported in .svg format (by cliking on the “camera” icon in the menu bar above the plot).</li>
-<li>The 3D visualisation can be exported in interactive html format by clicking on the “Download” button.</li>
+<li>The plots in The plots in the “3D plot”, “Map”, “Section X”, and “Section Y” can be exported:
+<ul>
+<li>in .svg format (by cliking on the “camera” icon in the menu bar above the plot),</li>
+<li>in an interactive html format, by clicking on the “Export” button.</li>
+</ul></li>
 <li>The plan of the excavation chronology can be exported in .svg format by clicking on the “Download” button.</li>
 </ul>
 </div>
@@ -587,10 +618,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <a class="sourceLine" id="cb9-4" data-line-number="4">          )</a></code></pre></div>
 <ul>
 <li><strong>square.size</strong>: numerical. Size (width and height) in centimeter of the squares in the grid system. Default value is 100 cm.</li>
-<li><strong>reverse.axis.values</strong>: character. Name of the axis or axes to be reversed (any combination of ‘x’, ‘y’, ‘z’).</li>
-<li><strong>reverse.square.names</strong>: character. Name of the axis or axes for which to reverse the order of the square labels (any combination of ‘x’, ‘y’, ‘z’).</li>
-<li><strong>add.x.square.labels</strong>: character. Additional square labels for the ‘x’ axis.</li>
-<li><strong>add.y.square.labels</strong>: character. Additional square labels for the ‘y’ axis.</li>
+<li><strong>reverse.axis.values</strong>: character. Name of the axis or axes to be reversed (any combination of “x”, “y”, “z”).</li>
+<li><strong>reverse.square.names</strong>: character. Name of the axis or axes for which to reverse the order of the square labels (any combination of “x”, “y”, “z”).</li>
+<li><strong>add.x.square.labels</strong>: character. Additional square labels for the “x” axis.</li>
+<li><strong>add.y.square.labels</strong>: character. Additional square labels for the “y” axis.</li>
 </ul>
 </div>
 <div id="parameters-presetting" class="section level3">
@@ -641,6 +672,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1>References</h1>
 <ul>
 <li>Plutniak, Sébastien, Renata Araujo, Sara Giardino. 2023. “archeoViz. Visualisation, Exploration, and Web Communication of Archaeological Excavation Data”. v1.0.0, DOI: <a href="https://doi.org/10.5281/zenodo.7682227">10.5281/zenodo.7682227</a>.</li>
+<li>Plutniak, Sébastien. 2023. “<a href="https://www.prehistoire.org/offres/doc_inline_src/515/0-BSPF_2023_1_2e_partie_Correspondance_PLUTNIAK.pdf">Visualiser et explorer la distribution spatiale du mobilier archéologique: l’application archeoViz et son portail web</a>”. <em>Bulletin de la Société préhistorique française</em>, 120(1), p. 70-74.</li>
 </ul>
 </div>
 

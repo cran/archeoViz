@@ -21,14 +21,15 @@
   grid.coord$x <- eval(parse(text = paste0("grid.coord$", xaxis)))
   
   # begin plot ----
-  section <- plotly::plot_ly(section.df)
+  section <- plotly::plot_ly(section.df,
+                             source = xaxis)
 
   # add config ----
   section <- plotly::config(section,
                             displaylogo = FALSE,
                             toImageButtonOptions = list(
                               format = "svg",
-                              filename = "archeoviz-section",
+                              filename = paste0("archeoviz-", xaxis, "-section"),
                               width = 600, height = 600
                               ))
   # add points ----
@@ -52,8 +53,7 @@
                                    showlegend=F, hoverinfo="skip", inherit = F)
 
   # add refits ----
-  if(! is.null(show.refits)){
-  if(show.refits){
+  if( sum(show.refits) > 0){
     
     refitting.df <- refitting.df()
     refitting.df <- refitting.df$refits.2d
@@ -74,8 +74,7 @@
                                  line = list(width=1),
                                  hoverinfo = "skip",
                                  inherit = F)
-  }
-}
+    }
   # add layout ----
   
   xrange <- c(eval(parse(text = paste0("coords$", xaxis, "min"))),

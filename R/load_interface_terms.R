@@ -78,9 +78,9 @@
     Un tableau au format csv est requis. Chaque ligne d\\u00e9crit un objet, comportant les champs obligatoires suivants :
     <ul>
       <li> <b>id</b> : <i>valeur alphanum\\u00e9rique</i>, identifiant unique de l'objet </li>
-      <li> <b>xmin</b> : <i>valeur num\\u00e9rique</i>, coordonn\\u00e9e de l'objet en axe X</li>
-      <li> <b>ymin</b> : <i>valeur num\\u00e9rique</i>, coordonn\\u00e9e de l'objet en axe Y</li>
-      <li> <b>zmin</b> : <i>valeur num\\u00e9rique</i>, coordonn\\u00e9e de l'objet en axe Z (profondeur)</li>
+      <li> <b>xmin</b> : <i>valeur num\\u00e9rique</i>, coordonn\\u00e9e de l'objet en axe X (en cm)</li>
+      <li> <b>ymin</b> : <i>valeur num\\u00e9rique</i>, coordonn\\u00e9e de l'objet en axe Y (en cm)</li>
+      <li> <b>zmin</b> : <i>valeur num\\u00e9rique</i>, coordonn\\u00e9e de l'objet en axe Z (valeur positive de profondeur en cm)</li>
       <li> <b>layer</b> : <i>valeur alphanum\\u00e9rique</i>, identifiant de la couche de l'objet</li>
       <li> <b>object_type</b> : <i>valeur alphanum\\u00e9rique</i>, cat\\u00e9gorie de l'objet</li>
     </ul>
@@ -102,9 +102,9 @@
     A data table is required (csv format). A row describes a single object with the following mandatory fields:
     <ul>
       <li> <b>id</b>: <i>alphanumerical value</i>, unique identifier of the object </li>
-      <li> <b>xmin</b>: <i>numerical value</i>, coordinate of the object on the X axis</li>
-      <li> <b>ymin</b>: <i>numerical value</i>, coordinate of the object on the Y axis</li>
-      <li> <b>zmin</b>: <i>numerical value</i>, coordinate of the object on the Z axis (depth)</li>
+      <li> <b>xmin</b>: <i>numerical value</i>, coordinate of the object on the X axis (in cm)</li>
+      <li> <b>ymin</b>: <i>numerical value</i>, coordinate of the object on the Y axis (in cm)</li>
+      <li> <b>zmin</b>: <i>numerical value</i>, coordinate of the object on the Z axis (positive depth value in cm)</li>
       <li> <b>layer</b>: <i>alphanumerical value</i>, identifier of the object's layer</li>
       <li> <b>object_type</b>: <i>alphanumerical value</i>, category of the object</li>
     </ul>
@@ -126,9 +126,9 @@
     \\u00c9 necess\\u00e1ria uma tabela no formato csv. Cada linha descreve um objeto, incluindo os seguintes campos obrigat\\u00f3rios:
     <ul>
       <li> <b>id</b> : <i>valor alfanum\\u00e9rico</i>, identificador \\u00fanico do objeto </li>
-      <li> <b>xmin</b> : <i>valor num\\u00e9rico</i>, coordenada do objeto no eixo X</li>
-      <li> <b>ymin</b> : <i>valor num\\u00e9rico</i>, coordenada do objeto no eixo Y</li>
-      <li> <b>zmin</b> : <i>valor num\\u00e9rico</i>, coordenada do objeto no eixo Z (profundidade)</li>
+      <li> <b>xmin</b> : <i>valor num\\u00e9rico</i>, coordenada do objeto no eixo X (em cm)</li>
+      <li> <b>ymin</b> : <i>valor num\\u00e9rico</i>, coordenada do objeto no eixo Y (em cm)</li>
+      <li> <b>zmin</b> : <i>valor num\\u00e9rico</i>, coordenada do objeto no eixo Z (valor de profundidade positiva em cm)</li>
       <li> <b>layer</b> : <i>valor alfanum\\u00e9rico</i>, identificador da camada do objeto</li>
       <li> <b>object_type</b> : <i>valor alfanum\\u00e9rico</i>, categoria do objeto</li>
     </ul>
@@ -150,9 +150,9 @@
     \\u00c8 richiesta una tabella in formato csv. Ogni riga descrive un oggetto, con i seguenti campi obbligatori:
     <ul>
       <li> <b>id</b> : <i>valore alfanumerico</i>, identificativo univoco dell\\u2019oggetto </li>
-      <li> <b>xmin</b> : <i>valore numerico</i>, coordinata dell\\u2019oggetto sull\\u2019asse X</li>
-      <li> <b>ymin</b> : <i>valore numerico</i>, coordinata dell\\u2019oggetto sull\\u2019asse Y</li>
-      <li> <b>zmin</b> : <i>valore numerico</i>, coordinata dell\\u2019oggetto sull\\u2019asse Z (profondit\\u00e0)</li>
+      <li> <b>xmin</b> : <i>valore numerico</i>, coordinata dell\\u2019oggetto sull\\u2019asse X (in cm)</li>
+      <li> <b>ymin</b> : <i>valore numerico</i>, coordinata dell\\u2019oggetto sull\\u2019asse Y (in cm)</li>
+      <li> <b>zmin</b> : <i>valore numerico</i>, coordinata dell\\u2019oggetto sull\\u2019asse Z (valore positivo di profondit\\u00e0 in cm)</li>
       <li> <b>layer</b> : <i>valore numerico</i>, identificativo del livello dell\\u2019oggetto</li>
       <li> <b>object_type</b> : <i>valore alfanumerico</i>, categoria dell\\u2019oggetto</li>
     </ul>
@@ -370,7 +370,33 @@
 <li>a \\u201crefits\\u201d table (optional), with data about the refitting objects;</li>
 <li>a \\u201ctimeline\\u201d table (optional), with data about when each square of the site was excavated.</li>
 </ul>
-<p>The tables must be .csv files with the first row used containing the columns\\u2019 labels (the separator can be set). More details about the required formats and columns are provided in the \\u201cInput data\\u201d tab.</p>
+<p>The tables must be .csv files with the first row used containing the columns\\u2019 labels (the separator can be set). Contents in html are allowed. This makes possible, in particular, to add links to external resources (e.g., the permanent identifier of the object\\u2019s in other databases, or of the concepts used to describe the object, etc.).</p>
+<h4 id=objects-table>Objects table</h4>
+<p>A row describes a single object with the following mandatory fields:</p>
+<ul>
+<li><strong>id</strong>: <em>alphanumerical value</em>, unique identifier of the object</li>
+<li><strong>xmin</strong>: <em>numerical value</em>, coordinate of the object on the X axis (in cm)</li>
+<li><strong>ymin</strong>: <em>numerical value</em>, coordinate of the object on the Y axis (in cm)</li>
+<li><strong>zmin</strong>: <em>numerical value</em>, coordinate of the object on the Z axis (positive depth value in cm)</li>
+<li><strong>layer</strong>: <em>alphanumerical value</em>, identifier of the object\\u2019s layer</li>
+<li><strong>object_type</strong>: <em>alphanumerical value</em>, category of the object</li>
+</ul>
+<p>In addition, optional fields are possible, including:</p>
+<ul>
+<li><strong>square_x</strong>: <em>alphanumerical value</em>, identifier of the square on the X axis</li>
+<li><strong>square_y</strong>: <em>alphanumerical value</em>, identifier of the square on the Y axis</li>
+<li><strong>year</strong> : <em>numerical value</em>, year when the object was excavated</li>
+<li><strong>xmax</strong>: <em>numerical value</em>, when the X location of the object is included in a range of X coordinates</li>
+<li><strong>ymax</strong>: <em>numerical value</em>, when the Y location of the object is included in a range of Y coordinates</li>
+<li><strong>zmax</strong>: <em>numerical value</em>, when the Z location of the object is included in a range of Z coordinates</li>
+<li><strong>object_edit</strong>: unlimited number of additional variable describing the object (field names must start with <code>object_</code> and have different suffixes)</li>
+</ul>
+<p>The labels of the squares of the grid:</p>
+<ul>
+<li>are ordered alpha-numerically;</li>
+<li>are not displayed, in order to avoid erroneous displays, if the number of labels does not correspond exactly to the total number of 100 cm squares that can be defined in the range of minimum and maximum coordinates contained in the xmin and ymin variables;</li>
+<li>can be completed with the <code>add.x.square.labels</code> and <code>add.y.square.labels</code> parameters of the <code>archeoViz()</code> function in order to add the missing labels (on the X and Y axes of the grid, respectively).</li>
+</ul>
 <h3 id=random-data>Random data</h3>
 <p>For demonstration purposes using randomly generated data is made possible. To activate this feature, set the slider in \\u201cInput data\\u201d to a value higher than 0 (setting the value back to 0 deactivates the feature). An \\u201cobjects\\u201d data set, a \\u201crefits\\u201d data set, and a \\u201ctimeline\\u201d data set are generated, making it possible to test all the <code>archeoViz</code> functionalities.</p>
 <h3 id=through-function-parameters>Through function parameters</h3>
@@ -389,7 +415,7 @@
 <h3 id=data-subgroups>Data subgroups</h3>
 <p>The data can be grouped in two ways: either by layer or by the selected \\u201cobject_\\u201d variable. This option determines the colours of the points in the 3D and 2D plots and the subsets when computing surfaces and convex hulls.</p>
 <h3 id=objects-selection>Objects selection</h3>
-<p>In the \\u201c3D plot\\u201d tab, clicking on a point displays information about that point in the table below the plot.</p>
+<p>In the \\u201c3D plot\\u201d, \\u201cMap\\u201d, \\u201cSection X\\u201d, and \\u201cSection Y\\u201d tabs, clicking on a point displays information about that point in the table below the plot.</p>
 <h2 id=interactive-visualisation>Interactive visualisation</h2>
 <p>The plots in the \\u201c3D plot\\u201d, \\u201cMap\\u201d, \\u201cSection X\\u201d, and \\u201cSection Y\\u201d tabs are generated using the <a href=https://CRAN.R-project.org/package=plotly><code>plotly</code></a> library. All the plots are dynamic and include a menu bar above the plot with several options (generating an image file, zooming, moving the view, etc). See details on the <a href=http://plotly.github.io/getting-to-know-the-plotly-modebar/><code>plotly</code> website</a>.</p>
 <p>Clicking on a legend\\u2019s item modifies the display:</p>
@@ -401,8 +427,11 @@
 <h2 id=graphical-outputs>Graphical outputs</h2>
 <p>Several graphical outputs can be generated in <code>archeoViz</code>.</p>
 <ul>
-<li>The 3D visualisation, the map and the section visualisation can all be exported in .svg format (by cliking on the \\u201ccamera\\u201d icon in the menu bar above the plot).</li>
-<li>The 3D visualisation can be exported in interactive html format by clicking on the \\u201cDownload\\u201d button.</li>
+<li>The plots in The plots in the \\u201c3D plot\\u201d, \\u201cMap\\u201d, \\u201cSection X\\u201d, and \\u201cSection Y\\u201d can be exported:
+<ul>
+<li>in .svg format (by cliking on the \\u201ccamera\\u201d icon in the menu bar above the plot),</li>
+<li>in an interactive html format, by clicking on the \\u201cExport\\u201d button.</li>
+</ul></li>
 <li>The plan of the excavation chronology can be exported in .svg format by clicking on the \\u201cDownload\\u201d button.</li>
 </ul>
 <h2 id=reffiting>Reffiting</h2>
@@ -461,10 +490,10 @@
 <a class=sourceLine id=cb9-4 data-line-number=4>          )</a></code></pre></div>
 <ul>
 <li><strong>square.size</strong>: numerical. Size (width and height) in centimeter of the squares in the grid system. Default value is 100 cm.</li>
-<li><strong>reverse.axis.values</strong>: character. Name of the axis or axes to be reversed (any combination of \\u2018x\\u2019, \\u2018y\\u2019, \\u2018z\\u2019).</li>
-<li><strong>reverse.square.names</strong>: character. Name of the axis or axes for which to reverse the order of the square labels (any combination of \\u2018x\\u2019, \\u2018y\\u2019, \\u2018z\\u2019).</li>
-<li><strong>add.x.square.labels</strong>: character. Additional square labels for the \\u2018x\\u2019 axis.</li>
-<li><strong>add.y.square.labels</strong>: character. Additional square labels for the \\u2018y\\u2019 axis.</li>
+<li><strong>reverse.axis.values</strong>: character. Name of the axis or axes to be reversed (any combination of \\u201cx\\u201d, \\u201cy\\u201d, \\u201cz\\u201d).</li>
+<li><strong>reverse.square.names</strong>: character. Name of the axis or axes for which to reverse the order of the square labels (any combination of \\u201cx\\u201d, \\u201cy\\u201d, \\u201cz\\u201d).</li>
+<li><strong>add.x.square.labels</strong>: character. Additional square labels for the \\u201cx\\u201d axis.</li>
+<li><strong>add.y.square.labels</strong>: character. Additional square labels for the \\u201cy\\u201d axis.</li>
 </ul>
 <h3 id=parameters-presetting>Parameters presetting</h3>
 <div class=sourceCode id=cb10><pre class=sourceCode r><code class=sourceCode r><a class=sourceLine id=cb10-1 data-line-number=1><span class=kw>archeoViz</span>(<span class=dt>class.variable =</span> <span class=ot>NULL</span>, <span class=dt>class.values =</span> <span class=ot>NULL</span>,</a>
@@ -505,6 +534,7 @@
 <h1 id=references>References</h1>
 <ul>
 <li>Plutniak, S\\u00e9bastien, Renata Araujo, Sara Giardino. 2023. \\u201carcheoViz. Visualisation, Exploration, and Web Communication of Archaeological Excavation Data\\u201d. v1.0.0, DOI: <a href=https://doi.org/10.5281/zenodo.7682227>10.5281/zenodo.7682227</a>.</li>
+<li>Plutniak, S\\u00e9bastien. 2023. \\u201c<a href=https://www.prehistoire.org/offres/doc_inline_src/515/0-BSPF_2023_1_2e_partie_Correspondance_PLUTNIAK.pdf>Visualiser et explorer la distribution spatiale du mobilier arch\\u00e9ologique: l\\u2019application archeoViz et son portail web</a>\\u201d. <em>Bulletin de la Soci\\u00e9t\\u00e9 pr\\u00e9historique fran\\u00e7aise</em>, 120(1), p. 70-74.</li>
 </ul>
 "
   
@@ -632,7 +662,33 @@ guidelines.fr <- "
 <li>un tableau \\u201crefits\\u201d (optionnel), \\u00e0 propos des relations de remontage;</li>
 <li>un tableau \\u201ctimeline\\u201d (optionnel), \\u00e0 propos des carr\\u00e9s du site et des ann\\u00e9es o\\u00f9 ils ont \\u00e9t\\u00e9 fouill\\u00e9s.</li>
 </ul>
-<p>Les tableaux doivent \\u00eatre au format .csv et la premi\\u00e8re ligne doit contenir les noms des variables (le symbole s\\u00e9parateur du csv peut \\u00eatre d\\u00e9fini dans l\\u2019interface). Plus de d\\u00e9tails \\u00e0 propos des formats et des colonnes sont donn\\u00e9s dans l\\u2019onglet \\u201cDonn\\u00e9es\\u201d.</p>
+<p>Les tableaux doivent \\u00eatre au format .csv et la premi\\u00e8re ligne doit contenir les noms des variables (le symbole s\\u00e9parateur du csv peut \\u00eatre d\\u00e9fini dans l\\u2019interface). Les contenus au format html sont autoris\\u00e9s. Cela permet notamment d\\u2019introduire r\\u00e9f\\u00e9rences vers des ressources compl\\u00e9mentaires du jeu de donn\\u00e9es (par .ex l\\u2019identifiant unique de l\\u2019objets dans une autre base de donn\\u00e9es, ou ceux des concepts d\\u2019ontologies employ\\u00e9s pour d\\u00e9crire l\\u2019objet, etc.).</p>
+<h4 id=tableau-objets>Tableau objets</h4>
+<p>Chaque ligne d\\u00e9crit un objet et doit comporter les variables obligatoires suivantes :</p>
+<ul>
+<li><strong>id</strong> : <em>valeur alphanum\\u00e9rique</em>, identifiant unique de l\\u2019objet</li>
+<li><strong>xmin</strong> : <em>valeur num\\u00e9rique</em>, coordonn\\u00e9e de l\\u2019objet en axe X (en cm)</li>
+<li><strong>ymin</strong> : <em>valeur num\\u00e9rique</em>, coordonn\\u00e9e de l\\u2019objet en axe Y (en cm)</li>
+<li><strong>zmin</strong> : <em>valeur num\\u00e9rique</em>, coordonn\\u00e9e de l\\u2019objet en axe Z (valeur positive de profondeur en cm)</li>
+<li><strong>layer</strong> : <em>valeur alphanum\\u00e9rique</em>, identifiant de la couche de l\\u2019objet</li>
+<li><strong>object_type</strong> : <em>valeur alphanum\\u00e9rique</em>, cat\\u00e9gorie de l\\u2019objet</li>
+</ul>
+<p>De plus, des variables optionnelles sont possibles:</p>
+<ul>
+<li><strong>square_x</strong> : <em>valeur alphanum\\u00e9rique</em>, identifiant du carr\\u00e9 de l\\u2019objet en axe X</li>
+<li><strong>square_y</strong> : <em>valeur alphanum\\u00e9rique</em>, identifiant du carr\\u00e9 de l\\u2019objet en axe Y</li>
+<li><strong>year</strong> : <em>valeur num\\u00e9rique</em>, ann\\u00e9e de fouille de l\\u2019objet</li>
+<li><strong>xmax</strong> : <em>valeur num\\u00e9rique</em>, lorsque la localisation de l\\u2019objet en X est comprise dans un intervalle de coordonn\\u00e9es</li>
+<li><strong>ymax</strong> : <em>valeur num\\u00e9rique</em>, lorsque la localisation de l\\u2019objet en Y est comprise dans un intervalle de coordonn\\u00e9es</li>
+<li><strong>zmax</strong> : <em>valeur num\\u00e9rique</em>, lorsque la localisation de l\\u2019objet en Z est comprise dans un intervalle de coordonn\\u00e9es</li>
+<li><strong>object_edit</strong> : nombre non limit\\u00e9 de variables additionnelles d\\u00e9crivant l\\u2019objet (les noms de colonnes doivent commencer par <em>object_</em> et avoir des suffixes diff\\u00e9rents</li>
+</ul>
+<p>Les labels des carr\\u00e9s du carroyage :</p>
+<ul>
+<li>sont ordonn\\u00e9s alpha-num\\u00e9riquement ;</li>
+<li>ne sont pas affich\\u00e9s, afin d\\u2019\\u00e9viter des affichages erron\\u00e9s, si le nombbre de labels ne correspond pas exactement au nombre total de carr\\u00e9s de 100 cm pouvant \\u00eatre d\\u00e9finis dans l\\u2019intervalle des coordonn\\u00e9es minimales et maximales contenues dans les variables xmin et ymin ;</li>
+<li>peuvent \\u00eatre compl\\u00e9t\\u00e9s avec les param\\u00e8tres <code>add.x.square.labels</code> et <code>add.y.square.labels</code> de la fonction <code>archeoViz()</code> afin d\\u2019ajouter les labels manquants (respectivement, sur les axes X et Y du carroyage).</li>
+</ul>
 <h3 id=par-g\\u00e9n\\u00e9ration-de-donn\\u00e9es-al\\u00e9atoires>Par g\\u00e9n\\u00e9ration de donn\\u00e9es al\\u00e9atoires</h3>
 <p>\\u00c0 des fins de d\\u00e9monstration, il est possible d\\u2019employer des donn\\u00e9es al\\u00e9atoirement g\\u00e9n\\u00e9r\\u00e9es. D\\u00e9placer le curseur sur une valeur sup\\u00e9rieure \\u00e0 0, dans l\\u2019onglet \\u201cDonn\\u00e9es\\u201d, active cette fonctionnalit\\u00e9 (replacer le curseur sur 0 la d\\u00e9sactive). Des donn\\u00e9es d\\u2019objets, de remontage, et de chronologie de la fouille sont alors g\\u00e9n\\u00e9r\\u00e9s, permettant de tester toutes les fonctionnalit\\u00e9s d\\u2019<code>archeoViz</code>.</p>
 <h3 id=par-param\\u00e9trage-de-la-fonction>Par param\\u00e9trage de la fonction</h3>
@@ -652,7 +708,7 @@ guidelines.fr <- "
 <p>Il est, de plus, possible de pr\\u00e9ciser si les couleurs doivent \\u00eatre d\\u00e9finies en fonction des couches ou en fonction de la variable objet s\\u00e9lectionn\\u00e9e.</p>
 <p>Des sous-groupes de donn\\u00e9es peuvent \\u00eatre d\\u00e9finies de deux mani\\u00e8res: soit par couche ou en fonction de la variable \\u201cobject_\\u201d s\\u00e9lectionn\\u00e9e. Cette option d\\u00e9termine l\\u2019application des couleurs dans les graphiques 3D et 2D et les sous-groupes de donn\\u00e9es auxquels sont appliqu\\u00e9s les calculs de surface de r\\u00e9gression et d\\u2019enveloppes convexes.</p>
 <h3 id=par-objet>Par objet</h3>
-<p>Enfin, dans l\\u2019onglet \\u201cVue 3D\\u201d, cliquer sur un point active l\\u2019affichage d\\u2019information \\u00e0 son sujet dans le tableau pr\\u00e9sent sous la visualisation.</p>
+<p>Dans les onglets \\u201cVue 3D\\u201d, \\u201cCarte\\u201d, \\u201cSection X\\u201d et  \\u201cSection Y\\u201d, cliquer sur un point active l'affichage d'informations \\u00e0 son sujet dans le tableau pr\\u00e9sent sous la visualisation.</p>
 <h2 id=remontages>Remontages</h2>
 <p>Les remontages sont g\\u00e9n\\u00e9ralement enregistr\\u00e9s de deux mani\\u00e8res par les arch\\u00e9ologues:</p>
 <ol>
@@ -676,8 +732,11 @@ guidelines.fr <- "
 <h2 id=sorties-graphiques>Sorties graphiques</h2>
 <p>Plusieurs sorties graphiques peuvent \\u00eatre g\\u00e9n\\u00e9r\\u00e9es dans <code>archeoViz</code>.</p>
 <ul>
-<li>Les visualisations en 3D, en plan et en sections comportent une fonction d\\u2019export graphique en format .svg (accessible en cliquant sur l\\u2019ic\\u00f4ne \\u201cappareil photo\\u201d de la barre de menu s\\u2019affichant au dessus des visualisations).</li>
-<li>La visualisation 3D peut \\u00eatre export\\u00e9e en format html interactif en cliquant sur le bouton \\u201cT\\u00e9l\\u00e9charger\\u201d.</li>
+<li>Les visualisations en 3D, en plan et en sections peuvent \\u00eatre export\\u00e9es :
+<ul>
+<li>au format .svg, en cliquant sur l\\u2019ic\\u00f4ne \\u201cappareil photo\\u201d de la barre de menu s\\u2019affichant au dessus des visualisations ;</li>
+<li>en format html interactif, en cliquant sur le bouton \\u201cExporter\\u201d dans la colonne droite de l\\u2019interface.</li>
+</ul></li>
 <li>Le plan de la chronologie des fouilles peut \\u00eatre t\\u00e9l\\u00e9charg\\u00e9 au format .svg en cliquant sur le bouton \\u201cT\\u00e9l\\u00e9charger\\u201d.</li>
 </ul>
 <h2 id=statistiques-spatiales>Statistiques spatiales</h2>
@@ -768,6 +827,7 @@ guidelines.fr <- "
 <h1 id=r\\u00e9f\\u00e9rences>R\\u00e9f\\u00e9rences</h1>
 <ul>
 <li>Plutniak, S\\u00e9bastien, Renata Araujo, Sara Giardino. 2023. \\u201carcheoViz. Visualisation, Exploration, and Web Communication of Archaeological Excavation Data\\u201d. v1.0.0, DOI: <a href=https://doi.org/10.5281/zenodo.7682227>10.5281/zenodo.7682227</a>.</li>
+<li>Plutniak, S\\u00e9bastien. 2023. \\u201c<a href=https://www.prehistoire.org/offres/doc_inline_src/515/0-BSPF_2023_1_2e_partie_Correspondance_PLUTNIAK.pdf>Visualiser et explorer la distribution spatiale du mobilier arch\\u00e9ologique: l\\u2019application archeoViz et son portail web</a>\\u201d. <strong>Bulletin de la Soci\\u00e9t\\u00e9 pr\\u00e9historique fran\\u00e7aise</strong>, 120(1), p. 70-74.</li>
 </ul>
 "
   
@@ -787,6 +847,7 @@ guidelines.fr <- "
     tab.guidelines = "Aide",
     all = "TOUTES",
     download = "T\\u00e9l\\u00e9charger",
+    export = "Exporter (html)",
     location = "Mode de localisation",
     values = "Valeurs",
     validate = "1) Valider la s\\u00e9lection",
@@ -823,15 +884,24 @@ guidelines.fr <- "
     group = "Grouper les donn\\u00e9es",
     through = "avec",
     total = "Total",
-    exact.fuzzy = "Exacte ou vague",
-    click.on.point = "Cliquez sur un point pour afficher ses information.",
+    objects = "objets",
+    show.uncertainty = "Montrer les incertitudes",
+    linear.uncertainty = "incertitude lin\\u00e9aire",
+    planar.uncertainty = "incertitude planaire",
+    volume.uncertainty = "incertitude volum\\u00e9trique",
+    linear = "Lin\\u00e9aire",
+    planar = "Planaire",
+    volume = "Volum\\u00e9trique",
+    click.on.point = "Cliquez sur un point pour afficher ses informations.",
     notif.objects.ok = "Fichier des objets ok!",
     notif.objects.not.ok = "Erreur. Certains champs requis sont absents, v\\u00e9rifiez le fichier.",
     notif.no.data = "Pas de donn\\u00e9es dans ces intervalles.",
     notif.tick.value = "Cochez au moins une valeur (dans le menu lat\\u00e9ral gauche).",
     notif.error.coords.type = "Des valeurs xmin, ymin, ou zmin ne sont pas num\\u00e9riques.",
     notif.error.identifier = "Les identifiants uniques des objets ne sont pas uniques.",
-    notif.warn.obj.removed = "Les objets aux coordonn\\u00e9es incompl\\u00e8tes ont \\u00e9t\\u00e9 supprim\\u00e9s."
+    notif.warn.obj.removed = "Les objets aux coordonn\\u00e9es incompl\\u00e8tes ont \\u00e9t\\u00e9 supprim\\u00e9s.",
+    notif.warn.uncertainty = "Nombreuses localisations incertaines. L'affichage risque d'\\u00eatre lent.",
+    notif.warn.refits = "Nombreux remontages. L'affichage risque d'\\u00eatre lent."
   )
   
   # : en ----
@@ -848,6 +918,7 @@ guidelines.fr <- "
     tab.guidelines = "Guidelines",
     all = "ALL",
     download = "Download",
+    export = "Html export",
     location = "Location method",
     values = "Values",
     validate = "(1) Validate selection",
@@ -881,9 +952,16 @@ guidelines.fr <- "
     fuzzy = "Fuzzy",
     depth = "Depth",
     group = "Group data",
-    total = "Total",
     through = "with",
-    exact.fuzzy = "Exact or fuzzy",
+    total = "Total",
+    objects = "objects",
+    linear.uncertainty = "linear uncertainty",
+    planar.uncertainty = "planar uncertainty",
+    volume.uncertainty = "volume uncertainty",
+    linear = "Linear",
+    planar = "Planar",
+    volume = "Volume",
+    show.uncertainty = "Show uncertainty",
     click.on.point = "Click on a point to get more information.",
     notif.objects.ok = "Objects file ok!",
     notif.objects.not.ok = "Error. Some of the mandatory fields are absent. Please check the file.",
@@ -891,7 +969,9 @@ guidelines.fr <- "
     notif.tick.value = "Tick at least one value (in the left side menu)",
     notif.error.coords.type = "xmin, ymin, or zmin value(s) are not numerical.",
     notif.error.identifier = "Some of the objects' unique identifier are duplicated.",
-    notif.warn.obj.removed = "Objects with incomplete coordinates have been removed."
+    notif.warn.obj.removed = "Objects with incomplete coordinates have been removed.",
+    notif.warn.uncertainty = "Many objects with uncertain location: it might slow down the app.",
+    notif.warn.refits = "Many refits: it might slow down the app."
   )
   
   
@@ -909,6 +989,7 @@ guidelines.fr <- "
     tab.guidelines = "Ajuda",
     all = "TUDO",
     download = "Descarregar",
+    export = "Exportar (html)",
     location = "Modo de localiza\\u00e7\\u00e3o",
     values = "Valores",
     validate = "Validar a sele\\u00e7\\u00e3o",
@@ -945,7 +1026,14 @@ guidelines.fr <- "
     group = "Agrupar dados",
     through = "com",
     total = "Total",
-    exact.fuzzy = "Exato ou vago",
+    objects = "objetos",
+    show.uncertainty = "Mostrar incerteza",
+    linear.uncertainty = "incerteza linear",
+    planar.uncertainty = "incerteza plana",
+    volume.uncertainty = "incerteza volum\\u00e9trica",
+    linear = "Lineare",
+    planar = "Planare",
+    volume = "Volumetrica",
     click.on.point = "Clique sobre um ponto para obter mais informa\\u00e7\\u00f5es",
     notif.objects.ok = "Arquivo de objetos ok!",
     notif.objects.not.ok = "Erro. Certos campos exigidos est\\u00e3o ausentes. Por favor, verifique o arquivo.",
@@ -953,7 +1041,9 @@ guidelines.fr <- "
     notif.tick.value = "Marque pelo menos um valor (no menu lateral esquerdo).",
     notif.error.coords.type = "Os valores xmin, ymin, ou zmin n\\u00e3o s\\u00e3o num\\u00e9ricos.",
     notif.error.identifier = "Alguns dos identificadores \\u00fanicos dos objetos est\\u00e3o duplicados.",
-    notif.warn.obj.removed = "Objetos com coordenadas incompletas foram removidos."
+    notif.warn.obj.removed = "Objetos com coordenadas incompletas foram removidos.",
+    notif.warn.uncertainty = "Many objects with uncertain location: it might slow down the app.",
+    notif.warn.refits = "Many refits: it might slow down the app."
   )
   
   # : it ----
@@ -970,6 +1060,7 @@ guidelines.fr <- "
     tab.guidelines = "Aiuto",
     all = "TUTTE",
     download = "Scaricare",
+    export = "Esportare (html)",
     location = "Modalit\\u00e0 di localizzazione",
     values = "Valori",
     validate = "Convalida selezione",
@@ -1006,7 +1097,14 @@ guidelines.fr <- "
     group = "Raggruppare i dati",
     through = "con",
     total = "Totale",
-    exact.fuzzy = "Esatta o vago",
+    objects = "oggetti",
+    show.uncertainty = "Mostra l'incertezza",
+    linear.uncertainty = "incertezza lineare",
+    planar.uncertainty = "incertezza planare",
+    volume.uncertainty = "incertezza volumetrica",
+    linear = "Lineare",
+    planar = "Planare",
+    volume = "Volumetrica",
     click.on.point = "Fare clic su un punto per visualizzarne le informazioni",
     notif.objects.ok = "File degli oggetto ok!",
     notif.objects.not.ok = "Errore. Mancano alcuni campi obbligatori, controllare il file",
@@ -1014,7 +1112,9 @@ guidelines.fr <- "
     notif.tick.value = "Spuntare almeno un valore (nel menu laterale a sinistra)",
     notif.error.coords.type = "I valori xmin, ymin o zmin non sono numerici",
     notif.error.identifier = "Gli identificativi univoci degli oggetti non sono unici",
-    notif.warn.obj.removed = "Gli oggetti con coordinate incomplete sono stati rimossi"
+    notif.warn.obj.removed = "Gli oggetti con coordinate incomplete sono stati rimossi",
+    notif.warn.uncertainty = "Many objects with uncertain location: it might slow down the app.",
+    notif.warn.refits = "Many refits: it might slow down the app."
   )
   
   # SWITCH ----

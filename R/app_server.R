@@ -1,5 +1,3 @@
-
-
 app_server <- function(input, output, session) {
   .data <- NULL
   
@@ -105,7 +103,6 @@ app_server <- function(input, output, session) {
     
     if(class(refits)[1] != "list"){
       refits <- .do_refits_preprocessing(refits, objects.dataset())
-      # refits <- .do_refits_preprocessing(refits, objects.subdataset())
     }
     
     refits # an empty data.frame or a list with two dataframes
@@ -157,19 +154,15 @@ app_server <- function(input, output, session) {
   
   # : subset data  ----
   objects.subdataset <- eventReactive(input$goButton, {
-    req(input$class_variable, coords.min.max)
+    req(input$class_variable, coords.min.max, input$location)
     
     df <- objects.dataset()
     df$group.variable <- factor(eval(parse(text = paste0("df$", group.variable() ))))
     df$layer_color <- factor(df$group.variable,
-                             levels = levels(df$group.variable),
-                             labels = grDevices::rainbow(length(levels(df$group.variable))))
+                      levels = levels(df$group.variable),
+                      labels = grDevices::rainbow(length(levels(df$group.variable))))
     # location mode selection:
-    if(input$location != "exact.fuzzy"){
-      df.sub <- df[df$location_mode %in% input$location, ]
-    }else{
-      df.sub <- df
-    }
+    df.sub <- df[df$location_mode %in% input$location, ]
     
     # class selection:
     if( ! .term_switcher("all") %in% input$class_values){
@@ -319,25 +312,34 @@ app_server <- function(input, output, session) {
         tableOutput('refits.preview.tab'))
   })
   
-  # : 3D selection ----
-  output$id.tab <- renderTable({
-    # req(input$class_values)
-    # if (input$goButton == 0) return()
-    
-    dataset <- objects.subdataset()
-    x <- click.selection()$x 
-    y <- click.selection()$y 
-    z <- click.selection()$z 
-    id <- dataset[dataset$x == x & dataset$y == y &  dataset$z == z,]$id
-    df.tab <- dataset[which(dataset$id == id), ]
-    df.tab[, - which(colnames(df.tab) %in% c("x", "y", "z", "square_x", "square_y", "group.variable", "color.values", "xyz"))]
-  }, digits=0)
-  
-  output$id.table <- renderUI({
-    div(style = 'overflow-x: scroll; overflow: auto',
-        p(.term_switcher("click.on.point")),
-        tableOutput('id.tab'))
+  # : sel. tab: 3D ----
+
+  output$plot3d.selection.tab <- renderUI({
+    .do_selection_table("dataset" = objects.subdataset(), 
+                        "xyz" = plot3d.click.selection(),
+                        "dims" = "xyz")
   })
+  
+  # : sel. tab. : Map ----
+  output$map.selection.tab <- renderUI({
+    .do_selection_table("dataset" = objects.subdataset(), 
+                        "xyz" = map.click.selection(),
+                        "dims" = "xy")
+  })
+  # : sel. tab: X section ----
+  output$sectionX.selection.tab <- renderUI({
+    .do_selection_table("dataset" = objects.subdataset(), 
+                        "xyz" = sectionX.click.selection(),
+                        "dims" = "yz")
+  })
+
+  ## : sel. tab: Y section ----
+  output$sectionY.selection.tab <- renderUI({
+    .do_selection_table("dataset" = objects.subdataset(), 
+                        "xyz" = sectionY.click.selection(),
+                        "dims" = "xz")
+  })
+  
   
   # : by variable ----
   by.variable.table <- eventReactive(input$goButton, {
@@ -375,11 +377,10 @@ app_server <- function(input, output, session) {
       geom_vline(xintercept = square.coords$range.x, colour = "darkgrey" ) +
       geom_hline(yintercept = square.coords$range.y, colour = "darkgrey" ) +
       coord_fixed() +
-      scale_x_continuous(breaks = axis.labels$xaxis$breaks,
+      scale_x_continuous("", breaks = axis.labels$xaxis$breaks,
                          labels = axis.labels$xaxis$labels) +
-      scale_y_continuous(breaks = axis.labels$yaxis$breaks,
-                         labels = axis.labels$yaxis$labels) +
-      xlab("") + ylab("")
+      scale_y_continuous("", breaks = axis.labels$yaxis$breaks,
+                         labels = axis.labels$yaxis$labels) 
     
     # set background color:
     if(getShinyOption("background.col") != "white"){
@@ -444,11 +445,19 @@ app_server <- function(input, output, session) {
   
   # : timeline map ----
   timeline.map <- reactive({
-    # squares <- squares()
     axis.labels <- axis.labels()
 
     map.grid <- expand.grid("square_x" = axis.labels$xaxis$labels,
                             "square_y" = axis.labels$yaxis$labels)
+    
+    # reverse squares if needed:
+    reverse <- getShinyOption("reverse.axis.values")
+    if(grepl("x", reverse)){ 
+      levels(map.grid$square_x) <- rev(levels(map.grid$square_x))
+    }
+    if(grepl("y", reverse)){ 
+      levels(map.grid$square_y) <- rev(levels(map.grid$square_y))
+    }
     
     timeline.map <- ggplot() +
       theme_minimal(base_size = 12) +
@@ -461,18 +470,6 @@ app_server <- function(input, output, session) {
       coord_fixed() +
       xlab("") + ylab("")
     
-    # reverse axes if needed:
-    reverse <- getShinyOption("reverse.axis.values")
-    if(grepl("x", reverse)){ 
-      timeline.map <- timeline.map + 
-        scale_x_reverse(breaks = axis.labels$xaxis$breaks,
-                                   labels = axis.labels$xaxis$labels)
-    }
-    if(grepl("y", reverse)){ 
-      timeline.map <- timeline.map + 
-        scale_y_reverse(breaks = axis.labels$yaxis$breaks,
-                                   labels = axis.labels$yaxis$labels)
-    }
     timeline.map
   })   
   
@@ -498,14 +495,15 @@ app_server <- function(input, output, session) {
     # : plot initial ----
     fig <- plot_ly(dataset, x = ~x, y = ~y, z = ~z,
                    color = ~group.variable,
-                   colors =  colors.list(),
+                   colors = colors.list(),
                    size  = ~point.size,
                    sizes = size.scale,
                    marker = list(symbol = 'square', sizemode = 'diameter'),
                    text = ~paste('id:', id,
                                  '<br>Square:', square,
                                  '<br>Location:', location_mode,
-                                 '<br>Class:', object_type)
+                                 '<br>Class:', object_type),
+                   source = "A"
     )
     
     fig <- config(fig,
@@ -521,31 +519,157 @@ app_server <- function(input, output, session) {
     fig <- add_markers(fig)
     
     # : add refits lines  ----
-    
-    if(! is.null(input$refits)){
-      if(input$refits){
+    plot3.refits <- sum(c(input$refits,
+                          getShinyOption("params")$plot3d.refits))
+    if( plot3.refits > 0 ){
         refitting.df <- refitting.df()
+        refitting.df <- refitting.df$refits.3d
+
+        sel <- (refitting.df[, 1] %in% dataset$id) | (refitting.df[, 2] %in% dataset$id)
+        refitting.df <- refitting.df[which(sel), ]
 
         fig <- add_paths(fig, x= ~x, y= ~y, z= ~z,
                          split = ~id.internal,
-                         data = refitting.df$refits.3d,
-                         color = I("red"), showlegend = FALSE,
+                         data = refitting.df,
+                         color = I("red"),
                          hoverinfo = "skip",
-                         inherit = F)
-      }
+                         showlegend = FALSE, inherit = F)
+       
+        # warning : refits lines: ----
+        if( nrow(refitting.df) > 500){
+          showNotification(.term_switcher("notif.warn.refits"),
+            type = "warning", duration = 10)
+        }
     }
     
+    
+    # Uncertainty ----
+    if("show.uncertainty" %in% input$location){
+      
+      linear.n.objects <- 0
+      planar.n.objects <- 0
+      volume.n.objects <- 0
+      
+      fuzzy.sums <- table(dataset$fuzzy.sum)
+      
+      # : linear uncertainty ####
+      if("1" %in% names(fuzzy.sums) ){
+        linear.x.df <- dataset[dataset$fuzzy.sum == 1 & dataset$x.fuzzy, ]
+        if(nrow(linear.x.df) > 0){  
+          linear.x.df <- .do_uncertain_lines(linear.x.df)
+          }
+  
+        linear.y.df <- dataset[dataset$fuzzy.sum == 1 & dataset$y.fuzzy, ]
+        if(nrow(linear.y.df) > 0){
+          linear.y.df <- .do_uncertain_lines(linear.y.df)
+        }
+  
+        linear.z.df <- dataset[dataset$fuzzy.sum == 1 & dataset$z.fuzzy, ]
+        if(nrow(linear.z.df) > 0){
+          linear.z.df <- .do_uncertain_lines(linear.z.df)
+      }
+
+      linear.df <- rbind(linear.x.df, linear.y.df, linear.z.df)
+
+      fig <- plotly::add_paths(fig, x = ~xmin, y = ~ymin, z = ~zmin,
+                       split = ~id.internal,
+                       data = linear.df,
+                       color = ~group.variable,
+                       text = ~paste('id:', id,
+                                     '<br>Square:', square,
+                                     '<br>Location:', location_mode,
+                                     '<br>Class:', object_type),
+                       inherit = FALSE, showlegend = FALSE)
+      
+      linear.n.objects <- nrow(linear.df) / 2
+      }  # end if
+      
+      
+    # : planar uncertainty----
+    if("2" %in% names(fuzzy.sums) & ! is.null(fig)){
+      # NB: the function output is the updated fig itself (and not a table)
+      
+      df.fuzzy2 <- dataset[dataset$fuzzy.sum == 2, ]
+      planar.xz.df <- df.fuzzy2[df.fuzzy2$x.fuzzy & df.fuzzy2$z.fuzzy, ]
+      planar.yz.df <- df.fuzzy2[df.fuzzy2$y.fuzzy & df.fuzzy2$z.fuzzy, ]
+      planar.xy.df <- df.fuzzy2[df.fuzzy2$x.fuzzy & df.fuzzy2$y.fuzzy, ]
+      
+      fig <- .do_uncertain_mesh_plans(fig, planar.xz.df, axes="xz")
+      fig <- .do_uncertain_mesh_plans(fig, planar.yz.df, axes="yz")
+      fig <- .do_uncertain_mesh_plans(fig, planar.xy.df, axes="xy")
+      
+      planar.n.objects <- (nrow(planar.xz.df) + nrow(planar.yz.df) +
+                             nrow(planar.xy.df)) / 4
+    }
+      
+      
+    # : add volume uncertainty ----
+    if("3" %in% names(fuzzy.sums) ){
+      
+      volume.df <- dataset[dataset$fuzzy.sum == 3, ]
+      volume.n.objects <- nrow(volume.df) 
+      
+      volume.df <- apply(volume.df, 1, function(i) {
+        .get_volume_coordinates(id = i["id"],
+                                xmin = i["xmin"], xmax = i["xmax"],
+                                ymin = i["ymin"], ymax = i["ymax"],
+                                zmin = i["zmin"], zmax = i["zmax"],
+                                color = i["layer_color"],
+                                square = i["square"],
+                                object_type = i["object_type"])
+        }, simplify = F)
+      
+      volume.df <- do.call("rbind", volume.df)
+      
+      fig <- plotly::add_mesh(fig,
+                         x = volume.df[, 1],
+                         y = volume.df[, 2],
+                         z = volume.df[, 3],
+                         data = volume.df,
+                         i = c(7, 0, 0, 0, 4, 4, 6, 6, 4, 0, 3, 2), 
+                         j = c(3, 4, 1, 2, 5, 6, 5, 2, 0, 1, 6, 3), 
+                         k = c(0, 7, 2, 3, 6, 7, 1, 1, 5, 5, 7, 6), 
+                         split = ~id,
+                         facecolor = ~color,
+                         showscale = FALSE, inherit = FALSE,
+                         flatshading =TRUE, opacity = .5,
+                         text = ~paste('id:', id,
+                                       '<br>Square:', square,
+                                       '<br>Class:', object_type)
+        )
+    } # end If
+      
+      
+    # : warning uncertainty ----
+    if( (planar.n.objects + volume.n.objects) > 500){
+      showNotification(
+        .term_switcher("notif.warn.uncertainty"),
+        type = "warning", duration = 10)
+      showNotification(paste0(.term_switcher("linear.uncertainty"), ": ",
+                              linear.n.objects, " ",
+                              .term_switcher("objects")),
+        type = "warning", duration = 10)
+      showNotification(paste0(.term_switcher("planar.uncertainty"), ": ",
+                              planar.n.objects, " ",
+                              .term_switcher("objects")),
+        type = "warning", duration = 10)
+      showNotification(paste0(.term_switcher("volume.uncertainty"), ": ",
+                              volume.n.objects, " ",
+                              .term_switcher("objects")),
+        type = "warning", duration = 10)
+    }
+    
+    } # end if("show.uncertainty" %in% input$location)
+    
+    
     # : add surfaces ####
-    if(! is.null(input$surface)){
-      if(input$surface){
+    if(sum(input$surface) > 0){
         
         # filter the layers for which a regression surfaces must be computed:
         subsets <- table(dataset$group.variable) 
         subsets <- names(subsets[subsets > 100])
         
         # compute regression surfaces:
-        # surf.list <- lapply(subsets, .get_surface_model, df=dataset)
-        
         surf.list <- lapply(subsets, function(x) 
           .get_surface_model(df=dataset,
                             var=group.variable(), 
@@ -557,12 +681,10 @@ app_server <- function(input, output, session) {
                              z = surf.list[[i]]$z.matrix,
                              x = surf.list[[i]]$x,
                              y = surf.list[[i]]$y,
-                             inherit = F,
                              colorscale = list(c(0, 1), c("black", surf.list[[i]]$color)),
-                             hoverinfo="skip",
-                             opacity = .7, showscale=F)
+                             hoverinfo="skip",  showscale=FALSE,
+                             opacity = .7, inherit = FALSE)
         }
-      }
     }
     
     # :  add convex hull ####
@@ -576,7 +698,7 @@ app_server <- function(input, output, session) {
             .get_cxhull_model(df=dataset,
                               var=group.variable(), 
                               value = x))
-      # add mesh:
+      # add convex hull mesh:
       for(i in seq_len(length(mesh.list)) ){
         fig <-  add_mesh(fig,
                          x = mesh.list[[i]][[1]][,1] * -1,
@@ -653,11 +775,11 @@ app_server <- function(input, output, session) {
   
   output$plot3d <- plotly::renderPlotly(plot3d())
   
-  click.selection <- reactive(plotly::event_data("plotly_click"))
+  plot3d.click.selection <- reactive(plotly::event_data("plotly_click", source="A"))
   
-  
+  #  : widget out: 3D ----
   output$download.3d.plot <- downloadHandler(
-    filename = "3dplot.html",
+    filename = paste0(gsub(" ", "-", shiny::getShinyOption("title")), "-3d-plot.html"),
     content = function(file2) {
       htmlwidgets::saveWidget(plot3d(), file = file2)
     }
@@ -693,6 +815,15 @@ app_server <- function(input, output, session) {
   
   output$sectionXplot <- plotly::renderPlotly({sectionXplot()})
   
+  sectionX.click.selection <- reactive(plotly::event_data("plotly_click", source="y"))
+  
+  #  : widget out: X section ----
+  output$download.section.x.plot <- downloadHandler(
+    filename = paste0(gsub(" ", "-", shiny::getShinyOption("title")), "-sectionY.html"),
+    content = function(file2) {
+      htmlwidgets::saveWidget(sectionXplot(), file = file2)
+    }
+  )
   
   # : Y section plot ----
   goButtonY <- reactive({
@@ -722,6 +853,16 @@ app_server <- function(input, output, session) {
   }) #end section Y
   
   output$sectionYplot <- plotly::renderPlotly({sectionYplot()})
+  
+  sectionY.click.selection <- reactive(plotly::event_data("plotly_click", source="x"))
+  
+  #  : widget out: Y section ----
+  output$download.section.y.plot <- downloadHandler(
+    filename = paste0(gsub(" ", "-", shiny::getShinyOption("title")), "-sectionX.html"),
+    content = function(file3) {
+      htmlwidgets::saveWidget(sectionYplot(), file = file3)
+    }
+  )
   
   # : Map plot ####
   # goButtonZ <- reactive({
@@ -790,13 +931,15 @@ app_server <- function(input, output, session) {
     }
     
     # add refits:
-    if(! is.null(input$refits.map)){
+    map.refits <- sum(c(input$map.refits,
+                          getShinyOption("params")$map.refits))
+    map.refits
+    if( map.refits > 0 ){
       refitting.df <- refitting.df()
       refitting.df <- refitting.df$refits.2d
       
-      if(input$refits.map){
-        sel <- (refitting.df[, 1] %in% planZ.df$id) | (refitting.df[, 2] %in% planZ.df$id)
-        refitting.df <- refitting.df[which(sel), ]
+      sel <- (refitting.df[, 1] %in% planZ.df$id) | (refitting.df[, 2] %in% planZ.df$id)
+      refitting.df <- refitting.df[which(sel), ]
         
         if(nrow(refitting.df) > 1){
           # refitting.df <- cbind(
@@ -810,11 +953,12 @@ app_server <- function(input, output, session) {
                              y = .data[["y"]], yend = .data[["yend"]]),
                          color = "red", linewidth=.3 )
         }
-      } 
     }
     
     map <- ggplotly(map, tooltip = c("id", "xyz", "square",
-                                     "location_mode", "object_type")) 
+                                     "location_mode", "object_type"),
+                    source = "B") 
+    
     plotly::config(map,
                    displaylogo = FALSE,  
                    toImageButtonOptions = list(format = "svg",
@@ -823,6 +967,16 @@ app_server <- function(input, output, session) {
   },  ignoreNULL = ( ! getShinyOption("params")$run.plots) )
   
   output$map <- plotly::renderPlotly({ map() })
+  
+  map.click.selection <- reactive(plotly::event_data("plotly_click", source="B"))
+  
+  #  : widget out: Map  ----
+  output$download.map.plot <- downloadHandler(
+    filename = paste0(gsub(" ", "-", shiny::getShinyOption("title")), "-map.html"),
+    content = function(file2) {
+      htmlwidgets::saveWidget(map(), file = file2)
+    }
+  )
   
   # Conditionnal interface ----
   
@@ -958,6 +1112,7 @@ app_server <- function(input, output, session) {
   # : slider timeline  ----
   output$sliderTimeline <- renderUI({
     time.df <- timeline.data()
+    
     sliderInput("history.date", "Year", width="100%",  sep = "",
                 min = min(time.df$year), max = max(time.df$year),
                 value = min(time.df$year), step=1)
@@ -1043,22 +1198,14 @@ app_server <- function(input, output, session) {
     n.location.modes <- length(unique(df$location_mode))
     
     if(n.location.modes == 1){
-      # loc.modes <- c(.term_switcher(tolower(unique(df$location_mode))))
       loc.values <- c(unique(df$location_mode))
       loc.names <-  c(.term_switcher(loc.values))
-      # loc.modes <- unique(df$location_mode)
     } else if( n.location.modes == 2) {
-      # loc.modes <- c(.term_switcher("exact"), 
-      #                .term_switcher("fuzzy"), 
-      #                .term_switcher("exact.fuzzy"))
-      loc.values <- c("exact", "fuzzy", "exact.fuzzy")
+      loc.values <- c("exact", "fuzzy", "show.uncertainty")
       loc.names <- c(.term_switcher("exact"),
                      .term_switcher("fuzzy"),
-                     .term_switcher("exact.fuzzy"))
-      
+                     .term_switcher("show.uncertainty"))
     }
-    
-    # loc.modes <- structure(loc.modes, .Names = loc.modes)  
     
     loc.selection <- .term_switcher(tolower(unique(df$location_mode)[1]))
     loc.selection <- tolower(unique(df$location_mode)[1])
@@ -1066,8 +1213,8 @@ app_server <- function(input, output, session) {
       loc.selection <- getShinyOption("params")$location
     }
     
-    radioButtons("location", .term_switcher("location"),
-                 # choices = loc.modes,
+    #TODO : interdire qu'il n'y ai aucune sélection
+    checkboxGroupInput("location", .term_switcher("location"),
                  choiceNames = loc.names,
                  choiceValues = loc.values,
                  selected = loc.selection)
@@ -1078,15 +1225,15 @@ app_server <- function(input, output, session) {
     refitting.df <- refitting.df()
     if(nrow(refitting.df$refits.2d) > 0){
       checkboxInput("refits", .term_switcher("refits"),
-                    value = getShinyOption("params")$refits)
+                    value = getShinyOption("params")$plot3d.refits)
     }
   })
   
-  output$show.refits.map <- renderUI({
+  output$show.map.refits <- renderUI({
     refitting.df <- refitting.df()
     if(nrow(refitting.df$refits.2d) > 0){
-      checkboxInput("refits.map", .term_switcher("refits"),
-                    value = getShinyOption("params")$refits.map)
+      checkboxInput("map.refits", .term_switcher("refits"),
+                    value = getShinyOption("params")$map.refits)
     } 
   })
   
@@ -1122,7 +1269,7 @@ app_server <- function(input, output, session) {
   output$reproducibility <- reactive({
     
     get.shiny.param <- function(param){
-      param.value <- shiny::getShinyOption(param)
+      param.value <- getShinyOption(param)
       if( is.null(param.value)){
         return(NULL)
       } else if(param.value == ""){
@@ -1132,7 +1279,7 @@ app_server <- function(input, output, session) {
       }
     }
     
-    param.list <- list("square.size", "reverse.axis.values", "reverse.square.names",
+    param.list <- list("reverse.axis.values", "reverse.square.names",
                        "add.x.square.labels", "add.y.square.labels", "title", "lang", "set.theme")
     param.list <- sapply(param.list, get.shiny.param)
     param.list <- param.list[ ! sapply(param.list, is.null) ]
@@ -1145,11 +1292,13 @@ app_server <- function(input, output, session) {
       class_values <-  NULL
     }
     
-    params.list2 <- list("class.variable" = paste0("\"", input$class_variable, "\""),
+    params.list2 <- list("home.text" = "\" \"",
+                         "class.variable" = paste0("\"", input$class_variable, "\""),
                          "class.values" = class_values, 
+                         "square.size" = getShinyOption("square.size"),
                   "default.group" = paste0("\"", input$group.selection, "\""),
                   "location.mode" = paste0("\"", input$location, "\""),
-                  "map.z.val" = input$planZ, "map.density" = input$map.density,  "map.refits" = input$refits.map,
+                  "map.z.val" = input$planZ, "map.density" = paste0("\"", input$map.density, "\""),  "map.refits" = input$map.refits,
                   "plot3d.ratio" = input$ratio, "plot3d.hulls" = input$cxhull, "plot3d.surfaces" = input$surface,  "plot3d.refits" = input$refits,
                   "sectionX.x.val" = input$sectionXx, "sectionX.y.val" = input$sectionXy, "sectionX.refits" = input$refits.sectionX,
                   "sectionY.x.val" = input$sectionYx, "sectionY.y.val" = input$sectionYy, "sectionY.refits" = input$refits.sectionY
@@ -1178,6 +1327,9 @@ app_server <- function(input, output, session) {
     req(timeline.data)
     
     time.df <- timeline.data()
+
+    # year <- input$history.date
+    # if(is.null(input$history.date)){ year <- min(time.df$year, na.rm=T)}
     
     time.sub.df <- time.df[time.df$year == input$history.date, ]
     
@@ -1217,7 +1369,3 @@ app_server <- function(input, output, session) {
   
   
 } # end of server.R
-
-
-
-
