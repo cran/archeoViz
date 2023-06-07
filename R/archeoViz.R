@@ -10,7 +10,8 @@ archeoViz <- function(objects.df = NULL, refits.df = NULL, timeline.df = NULL,
                       plot3d.refits = NULL,
                       sectionX.x.val = NULL, sectionX.y.val = NULL, sectionX.refits = NULL, 
                       sectionY.x.val = NULL, sectionY.y.val = NULL, sectionY.refits = NULL,
-                      camera.center = NULL, camera.eye = NULL, run.plots = FALSE
+                      camera.center = c(0, 0, 0), camera.eye = c(1.25, 1.25, 1.25), 
+                      run.plots = FALSE, html.export = TRUE
                       ){
   
   
@@ -52,14 +53,13 @@ archeoViz <- function(objects.df = NULL, refits.df = NULL, timeline.df = NULL,
     background.col <- grDevices::rgb(.1,.1,.1)
   }
   
-  params <- list("class_variable" = class.variable, "class_values" = class.values,
+  params <- list("class.variable" = class.variable, "class.values" = class.values,
                  "default.group" = default.group, "location" = location.mode,
-                 "planZ" = map.z.val, "map.density" = map.density, "map.refits" = map.refits, 
-                 "plot3d.ratio" = plot3d.ratio, "cxhull" = plot3d.hulls, "surface" = plot3d.surfaces, "plot3d.refits" = plot3d.refits,
-                 "sectionXx" = sectionX.x.val, "sectionXy" = sectionX.y.val, "refits.sectionX" = sectionX.refits,
-                 "sectionYx" = sectionY.x.val, "sectionYy" = sectionY.y.val, "refits.sectionY" = sectionY.refits,
-                 "camera.center" = camera.center, "camera.eye" = camera.eye, "run.plots" = run.plots)
-  
+                 "map.z.val" = map.z.val, "map.density" = map.density, "map.refits" = map.refits, 
+                 "plot3d.ratio" = plot3d.ratio, "plot3d.hulls" = plot3d.hulls, "plot3d.surfaces" = plot3d.surfaces, "plot3d.refits" = plot3d.refits,
+                 "sectionX.x.val" = sectionX.x.val, "sectionX.y.val" = sectionX.y.val, "sectionX.refits" = sectionX.refits,
+                 "sectionY.x.val" = sectionY.x.val, "sectionY.y.val" = sectionY.y.val, "sectionY.refits" = sectionY.refits,
+                 "camera.center" = camera.center, "camera.eye" = camera.eye)
   
   # define shiny options ----
   shinyOptions("objects.df"  = objects.df,
@@ -76,7 +76,9 @@ archeoViz <- function(objects.df = NULL, refits.df = NULL, timeline.df = NULL,
                "lang"        = lang,
                "set.theme"   = set.theme,
                "ui.terms"    = ui.terms,
-               "background.col" = background.col)
+               "background.col" = background.col,
+               "run.plots" = run.plots,
+               "html.export" = html.export)
   
   shinyApp(ui = app_ui, server = app_server)
 }

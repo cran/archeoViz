@@ -1,4 +1,15 @@
 
+# archeoViz 1.2.0
+Released: 2023-06-07
+
+* URL parameters are now supported, including the following parameters: objects.df, refits.df, timeline.df, title, home.text, reverse.axis.values, reverse.square.names, square.size, add.x.square.labels, add.y.square.labels, class.variable, class.values, default.group, location.mode, map.density, map.refits, plot3d.hulls, plot3d.surfaces, plot3d.refits, sectionX.refits, sectionY.refits, run.plots
+
+# archeoViz 1.1.2
+Released: 2023-06-03
+
+* The display of the buttons to export the plots as html files can now be set to TRUE or FALSE with the 'export.html' parameter.
+* The small maps in the 'Section X' and 'Section Y' tabs can now be downloaded.
+
 # archeoViz 1.1.1
 Released: 2023-05-15
 

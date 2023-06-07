@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 #            refits.df = NULL,    # optional data.frame for refitting data
 #            timeline.df = NULL,  # optional data.frame for the excavation timeline
 #            title = NULL,        # title of the site / data set
-#            home.text = NULL,    # html content to display on the home page
+#            home.text = NULL,    # HTML content to display on the home page
 #            lang = "en"          # interface language ("en": English, "fr": French, "it": Italian, "pt": Portuguese)
 #            set.theme = "cosmo") # graphic theme for the Shiny interface
 
@@ -39,10 +39,11 @@ knitr::opts_chunk$set(
 #            class.variable = NULL, class.values = NULL,
 #            default.group = "by.layer", location.mode = NULL,
 #            map.z.val = NULL, map.density = "no", map.refits = NULL,
-#            plot3d.hulls = NULL, plot3d.surfaces = NULL, plot3d.refits = NULL,
+#            plot3d.ratio = 1, plot3d.hulls = NULL, plot3d.surfaces = NULL, plot3d.refits = NULL,
 #            sectionX.x.val = NULL, sectionX.y.val = NULL, sectionX.refits = NULL,
 #            sectionY.x.val = NULL, sectionY.y.val = NULL, sectionY.refits = NULL,
-#            camera.center = NULL, camera.eye = NULL, run.plots = FALSE
+#            camera.center = c(0, 0, 0), camera.eye = c(1.25, 1.25, 1.25),
+#            run.plots = FALSE, html.export = TRUE
 #            )
 
 ## ---- eval=FALSE--------------------------------------------------------------

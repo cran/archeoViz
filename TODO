@@ -3,32 +3,50 @@
 # archeoviz
 
 ## bugs 
+
 * bug dans la génération des svg pour les profils (les lignes qui délimitent la figure sont décalées)
-* revoir timeline, qui bloque à cause d'un if(from.ui.timeline) dans do_process_timeline()  
 * Densité 2D : erreurs occasionnelles lorsqu'impossibilité de générer les courbes de densité
-* Timeline : interface FR, traduire "year"
+* Cassenade : plot 3D, hull + refits : impossible de bouger la visuation 3D
+* run.plots ne fonctionne pas pour maps
+* test.do_refits_preprocessing.R  : fail in Github Action Ubunto :https://github.com/sebastien-plutniak/archeoviz/actions/runs/5180918673/jobs/9335737589
 
 ## simple enhancements
 
-* faire que dans le plan, la valeur de la variable de groupement sélectionnée s'affiche lors du hover
 * bouton Lancer / Rafraîchir
-* add test for reverse.axis.values et  reverse.square.names
-* passer la definition des squares dans une fonction .do_square_list() et ajouter des tests
+* add test for: reverse.axis.values,  reverse.square.names, do_r_command, .do_square_list
 * améliorer les labels pour les adapter lors de la représentation de grandes surfaces
-* ajouter le téléchargement en widget des sections et du plan
 
 ## new features
 
-* visualiser les incertitudes de positionnement, proposer 3 cases à cocher: 
-	"exact"
-	"vague"
-	"afficher les incertitudes"  (TODO :remplacer "exacte ou vague")
-* créer outil de formatage de tableau au format adapté à archeoViz
 * rendre possible le rearrangement des labels de carré : square_x, square_x_order, square_y, square_y_order
 * permettre de plotter les surfaces (suggestion D Giusti) 
 * calculer des surfaces d'interface entre couches
-* interfaçage / openarcheo ou nakala: faire qu'il soit possible de lancer avec un url une instance archeoviz mettant en evidence un objet.
-	(idée : un convertisseur tranforme l'url et ses parametres en commande archeoviz()  adaptée avec les paramètres)
+* étendre les paramètres possibles en URL : toute la listes des "params" + les shinyOptions.
+  interfaçage / openarcheo ou nakala: faire qu'il soit possible de lancer avec une url une instance archeoviz mettant en evidence un objet.
+	(idée : un convertisseur tranforme l'url et ses parametres en commande archeoviz() adaptée avec les paramètres)
+  Solution: une grosse fonction qui teste la présence de chaque paramètre dans l'url:
+    query <- shiny::parseQueryString(session$clientData$url_search)
+    
+    param_static <- names(query)[ names(query) %in% c("class_variable", "class_values", "default.group", "location", "planZ", "map.density", "map.refits", "plot3d.ratio", "cxhull", "surface", "plot3d.refits", "sectionXx", "sectionXy", "refits.sectionX", "sectionYx", "sectionYy", "refits.sectionY", "camera.center", "camera.eye") ]
+    
+    param_dynamic <- names(query)[ names(query) %in% c("objects.df", "refits.df", "timeline.df", "square.size", "reverse.axis.values", "reverse.square.names", "add.x.square.labels", "add.y.square.labels", "title", "home.text", "lang", "set.theme", "run.plots", "html.export") ]
+    
+  # param_static
+    sapply(param_static,  function(param_name) eval(parse( shinyOptions(param_name = query[[param_name]]) )) )
+    for(x in 1:length(param_static)){
+		param.list[[ names(param_dynamic) == names(param_dynamic[x]) ]] <- param_dynamic[x]
+		
+		eval(parse( shinyOptions(param_static[x] = query[[ names(param_static[x]) ]]) )) 
+	} 
+    
+  # param_dynamic
+	param.list <- getshinyOptions("params")
+	for(x in 1:length(param_dynamic)){
+		param.list[[ names(param_dynamic) == names(param_dynamic[x]) ]] <- param_dynamic[x]
+	} 
+	shinyOptions("params" =  param.list)
+                 
+                 
 * integrer 3 types d'enregistrement 
 	* par carré, carroyage 
 	* coordonnée absolues

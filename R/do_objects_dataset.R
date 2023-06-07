@@ -1,14 +1,15 @@
-.do_objects_dataset <- function(from.func.objects.df=NULL, demoData.n=NULL,
-                                input.ui.table=NULL, 
+.do_objects_dataset <- function(from.parameter.input=NULL, 
+                                from.ui.input=NULL, 
+                                demoData.n=NULL,
                                 add.x.square.labels=NULL, add.y.square.labels=NULL){
   # source selection ----
-  if (! is.null(from.func.objects.df)){
-    df <- from.func.objects.df
+  if (! is.null(from.parameter.input)){
+    df <- from.parameter.input
   } else{
     if(demoData.n > 0){
       df <- demo_objects_data(demoData.n)
-    } else if(! is.null(input.ui.table)){
-      df <- input.ui.table()
+    } else if(! is.null(from.ui.input)){
+      df <- from.ui.input()
     }
   }
   
@@ -66,6 +67,7 @@
     df <- df[ - n.removed, ]
   }
   
+  
   # : add max coordinates if absent: ----
   if(is.null(df$xmax)){ df$xmax <- df$xmin }
   if(is.null(df$ymax)){ df$ymax <- df$ymin }
@@ -75,6 +77,10 @@
   df[is.na(df$xmax), "xmax"] <- df[is.na(df$xmax), "xmin"]
   df[is.na(df$ymax), "ymax"] <- df[is.na(df$ymax), "ymin"]
   df[is.na(df$zmax), "zmax"] <- df[is.na(df$zmax), "zmin"]
+  
+  df[, c("xmin", "ymin", "zmin", "xmax", "ymax", "zmax")] <- 
+    apply(df[, c("xmin", "ymin", "zmin", "xmax", "ymax", "zmax")], 2, 
+          function(x) as.integer(trunc(x))  )
   
   # : location mode ----
   df[, "location_mode"] <- "exact"

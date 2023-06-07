@@ -16,10 +16,10 @@ ui <- shinyUI(
         conditionalPanel(condition = 'output.locationPanel',
             uiOutput("location_choice"),
             uiOutput("group.selector"),
-            uiOutput("class_variable"),
+            uiOutput("class.variable"),
             actionButton("goButton", .term_switcher("validate")),
             br(),br(),
-            uiOutput("class_values"),
+            uiOutput("class.values"),
             ), # end conditionnal panel
         width=2), # end sidebarpanel
 
@@ -117,13 +117,13 @@ ui <- shinyUI(
                             br(),
                             h4(.term_switcher("header.3d.options")),
                             uiOutput("show.surfaces"),
-                            checkboxInput("cxhull", .term_switcher("hulls"),
-                                          value = getShinyOption("params")$cxhull ),
-                            uiOutput("show.refits"),
+                            checkboxInput("plot3d.hulls", .term_switcher("hulls"),
+                                          value = getShinyOption("params")$plot3d.hulls ),
+                            uiOutput("show.3d.refits"),
                             sliderInput("point.size", .term_switcher("point.size"), width="100%", sep = "",
                                         min=1, max=5, value=2, step=1),
                             uiOutput("ratio3D"), 
-                            downloadButton("download.3d.plot", .term_switcher("export"))
+                            uiOutput("download.button.html.export.3d")
                      )  # end column
                    ),  # end fluid row
                    fluidRow(column(12,
@@ -144,11 +144,11 @@ ui <- shinyUI(
                             actionButton("goButtonZ", .term_switcher("refresh")),
                             br(), br(),
                             uiOutput("density_selector"),
-                            uiOutput("show.refits.map"),
+                            uiOutput("show.map.refits"),
                             sliderInput("map.point.size", .term_switcher("point.size"),
                                         width="100%", sep = "",
                                         min=1, max=10, value=2, step=1),
-                            downloadButton("download.map.plot", .term_switcher("export"))
+                            uiOutput("download.button.html.export.map")
                             )#end column
                    ), #end fluid row
                    fluidRow(column(12,
@@ -161,23 +161,27 @@ ui <- shinyUI(
           tabPanel("Section X",  # section X ----
                    fluidRow(
                      column(10,
-                            uiOutput("sliderYx"),
-                            uiOutput("sliderYy")
+                            uiOutput("sliderXx"),
+                            uiOutput("sliderXy")
                      ),
                      column(1,
-                            br(), actionButton("goButtonY", .term_switcher("refresh")))
+                            br(), actionButton("goButtonX", .term_switcher("refresh")))
                    ),
                    fluidRow(
                      column(9,
-                            plotly::plotlyOutput("sectionYplot", width = "100%", height = 500)
+                            plotly::plotlyOutput("sectionXplot", width = "100%", height = 500)
                      ),
-                     column(3,
-                            uiOutput("show.refits.sectionY"),
-                            sliderInput("sectionY.point.size", .term_switcher("point.size"),
+                     column(3, align="center",
+                            uiOutput("show.sectionX.refits"),
+                            sliderInput("sectionX.point.size", .term_switcher("point.size"),
                                         width="100%", sep = "",
                                         min=1, max=10, value=5, step=1),
-                            plotOutput("site.mapY"),
-                            downloadButton("download.section.y.plot", .term_switcher("export"))
+                            downloadLink("downloadMinimapX", 
+                                         paste(.term_switcher("download"),
+                                               tolower(.term_switcher("tab.map"))) ),
+                            br(),
+                            plotOutput("site.mapX"),
+                            uiOutput("download.button.html.export.sectionX")
                      )
                    ), #end fluid row
                    fluidRow(column(12,
@@ -190,23 +194,27 @@ ui <- shinyUI(
           tabPanel("Section Y",  #section Y ----
                    fluidRow(
                      column(10,
-                            uiOutput("sliderXx"),
-                            uiOutput("sliderXy")
+                            uiOutput("sliderYx"),
+                            uiOutput("sliderYy")
                      ),
                      column(1, br(),
-                            actionButton("goButtonX", .term_switcher("refresh")),)
+                            actionButton("goButtonY", .term_switcher("refresh")),)
                    ),
                    fluidRow(
                      column(9,
-                            plotly::plotlyOutput("sectionXplot", width = "100%", height = 500)
+                            plotly::plotlyOutput("sectionYplot", width = "100%", height = 500)
                      ),
-                     column(3,
-                            uiOutput("show.refits.sectionX"),
-                            sliderInput("sectionX.point.size", .term_switcher("point.size"),
+                     column(3, align="center",
+                            uiOutput("show.sectionY.refits"),
+                            sliderInput("sectionY.point.size", .term_switcher("point.size"),
                                         width="100%", sep = "",
                                         min=1, max=10, value=5, step=1),
-                            plotOutput("site.mapX"),
-                            downloadButton("download.section.x.plot", .term_switcher("export"))
+                            downloadLink("downloadMinimapY", 
+                                         paste(.term_switcher("download"),
+                                               tolower(.term_switcher("tab.map"))) ),
+                            br(),
+                            plotOutput("site.mapY"),
+                            uiOutput("download.button.html.export.sectionY")
                      )
                    ), #end fluid row
                    fluidRow(column(12,
@@ -232,11 +240,17 @@ ui <- shinyUI(
           tabPanel(.term_switcher("tab.timeline"),  # Timeline ----
                    uiOutput("sliderTimeline"),
                    fluidRow(
-                     column(7,
-                            imageOutput("timeline.map", width = "100%", height = "500px")),
-                     column(5,
-                            imageOutput("timeline.map.grid", width = "100%", height = "400px"),
-                            downloadButton("download.timeline.map", .term_switcher("download"))),
+                     column(7, align="center",
+                            imageOutput("timeline.map"), #,  height = "500px", width = "100%",
+                            br(),
+                            uiOutput("download.button.timeline.map")
+                            ),
+                            
+                     column(5,  align="center",
+                            imageOutput("timeline.map.grid"), #, width = "100%", height = "400px"
+                            br(),
+                            uiOutput("download.button.timeline.map.grid")
+                     )
                    ), #end fluidrow
           ), #end tabPanel
         
