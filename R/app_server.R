@@ -125,7 +125,8 @@ app_server <- function(input, output, session) {
   })
   
   timeline.data <- reactive({
-    objects.dataset <- objects.dataset()
+    
+    objects.df <- objects.dataset()
     
     query <- shiny::parseQueryString(session$clientData$url_search)
     
@@ -139,7 +140,7 @@ app_server <- function(input, output, session) {
     # sources priority: 
     #   function parameter > objects table > timeline table
     timeline <- .do_timelinedata(from.param.time.df, 
-                                 objects.dataset, 
+                                 objects.df, 
                                  timeline.ui.df) # this is the reactive object
     # notification disabled
     # showNotification(.term_switcher(timeline$notif.text),
@@ -166,7 +167,9 @@ app_server <- function(input, output, session) {
   refitting.df <- reactive({
     req(objects.dataset)
     
-    refits <- list("refits.2d" = data.frame(), "refits.3d" = data.frame())
+    refits <- list("refits.2d" = data.frame(),
+                   "refits.3d" = data.frame(),
+                   "raw" = data.frame())
     
     query <- shiny::parseQueryString(session$clientData$url_search)
     
@@ -184,7 +187,7 @@ app_server <- function(input, output, session) {
       refits <- .do_refits_preprocessing(refits, objects.dataset())
     }
     
-    refits # an empty data.frame or a list with two dataframes
+    refits # an empty data.frame or a list with three dataframes
   })  
   
   # Objects preprocessing: ----
@@ -221,10 +224,9 @@ app_server <- function(input, output, session) {
     
     showNotification(.term_switcher(result$notif.text),
                      type = result$notif.type, duration = 10)
-    
-    if(result$notif.type != "error"){
-      result$data
-    }
+    if(result$notif.type == "error") return(NULL)
+
+    result$data
   })
   
   # : group variable ----
@@ -264,6 +266,7 @@ app_server <- function(input, output, session) {
   
   # : coords min/max coordinates ----
   coords.min.max <- reactive({
+    
     .do_coords_minmax(objects.dataset(),
                       square.size = getShinyOption("square.size"),
                       reverse.axis.values = getShinyOption("reverse.axis.values"))
@@ -433,9 +436,16 @@ app_server <- function(input, output, session) {
                         "dims" = "xz")
   })
   
+  # goTables button
+  goTables <- reactive({
+    req(input$class.values, objects.dataset())
+    if( (input$goButton > 0) | getShinyOption("run.plots")  ){
+      TRUE
+    } else { return() }
+  })
   
   # : by variable ----
-  by.variable.table <- reactive({
+  by.variable.table <- eventReactive(goTables(), {
     req(input$class.variable, input$class.values, objects.subdataset)
     dataset <- objects.subdataset()
     
@@ -446,7 +456,7 @@ app_server <- function(input, output, session) {
                                           rownames = T, digits=0)
   
   # : by layer ----
-  by.layer.table <- reactive({
+  by.layer.table <- eventReactive(goTables(), {
     req(input$class.variable, input$class.values, objects.subdataset)
     dataset <- objects.subdataset()
     
@@ -594,7 +604,7 @@ app_server <- function(input, output, session) {
   })
   
   # PLOT  3D ----
-  plot3d <- eventReactive(goButton3D(), {
+  plot3d <- eventReactive(input$goButton3D, {
     req(ratio3D.value)
     validate(need(input$class.values, .term_switcher("notif.tick.value")))
     
@@ -602,8 +612,14 @@ app_server <- function(input, output, session) {
     coords <- coords.min.max()
     squares <- squares()
     axis.labels <- axis.labels()
-    dataset$point.size <- input$point.size
-    size.scale <- input$point.size
+    
+    if(is.null(input$point.size)){
+      dataset$point.size <- getShinyOption("params")$point.size
+      size.scale <- getShinyOption("params")$point.size
+    } else{
+      dataset$point.size <- input$point.size
+      size.scale <- input$point.size
+    }
     
     # : plot initial ----
     fig <- plot_ly(dataset, x = ~x, y = ~y, z = ~z,
@@ -632,19 +648,23 @@ app_server <- function(input, output, session) {
     fig <- add_markers(fig)
     
     # : add refits lines  ----
-    plot3.refits <- sum(c(input$plot3d.refits,
+    plot3d.refits <- sum(c(input$plot3d.refits,
                           getShinyOption("params")$plot3d.refits))
-    if( plot3.refits > 0 ){
+    if( plot3d.refits > 0 ){
       refitting.df <- refitting.df()
       refitting.df <- refitting.df$refits.3d
       
       sel <- (refitting.df[, 1] %in% dataset$id) | (refitting.df[, 2] %in% dataset$id)
       refitting.df <- refitting.df[which(sel), ]
       
+      # add color:
+      refitting.df <- .do_lines_colors(refitting.df, dataset, "group.variable")
+      
       fig <- add_paths(fig, x= ~x, y= ~y, z= ~z,
                        split = ~id.internal,
                        data = refitting.df,
-                       color = I("red"),
+                       color = ~group.variable,
+                       colors = colors.list(),
                        hoverinfo = "skip",
                        showlegend = FALSE, inherit = F)
       
@@ -884,7 +904,7 @@ app_server <- function(input, output, session) {
                                        z = ratio3D.value() * ((coords$zmax - coords$zmin) / (coords$xmax - coords$xmin)))
                   ))  #end layout
     # fig <- plotly::event_register(fig, 'plotly_click')
-  }) # end plot3d
+  }, ignoreNULL = ( ! getShinyOption("run.plots")) ) #  end plot3d
   
   output$plot3d <- plotly::renderPlotly(plot3d())
   
@@ -900,31 +920,43 @@ app_server <- function(input, output, session) {
   
   # PLOTS 2D ----
   # :  X section plot ----
-  goButtonX <- reactive({
-    req(input$class.variable, input$class.values, input$sectionX.y.val)
-    if( (input$goButtonX > 0) | getShinyOption("run.plots")  ){
-      TRUE
-    } else { return() }
-  })
   
-  sectionXplot <- shiny::eventReactive(goButtonX(), {
+  sectionXplot <- shiny::eventReactive(input$goButtonX, {
+    req(init.values, objects.subdataset)
     dataset <- objects.subdataset()
     
-    sel <- (dataset$y >= input$sectionX.y.val[1] & dataset$y <= input$sectionX.y.val[2]) &
-      (dataset$x >= input$sectionX.x.val[1] & dataset$x <= input$sectionX.x.val[2])
+    if(is.null(input$sectionX.y.val)){
+      sectionX.y.val <- init.values()$valuesXy
+      sectionX.x.val <- init.values()$valuesXx
+    } else{
+      sectionX.x.val <- input$sectionX.x.val  
+      sectionX.y.val <- input$sectionX.y.val  
+    }
     
+    sel <- (dataset$y >= sectionX.y.val[1] & dataset$y <= sectionX.y.val[2]) &
+      (dataset$x >= sectionX.x.val[1] & dataset$x <= sectionX.x.val[2])
+    
+    if(is.null(input$sectionX.point.size)){
+      sectionX.point.size <- getShinyOption("params")$point.size
+    } else{
+      sectionX.point.size <- input$sectionX.point.size
+    }
+    
+    # add refits:
+    section.x.refits <- sum(c(input$sectionX.refits,
+                              getShinyOption("params")$sectionX.refits))
     .do_section_plot(selection = sel,
                      dataset = dataset,
-                     section.point.size = input$sectionX.point.size,
+                     section.point.size = sectionX.point.size,
                      refitting.df = refitting.df, # this is the reactive output
-                     show.refits = input$sectionX.refits,
+                     show.refits = section.x.refits,
                      colors = colors.list(),
                      grid.coord = grid.coordy(),
                      coords = coords.min.max(),
                      axis.labels = axis.labels(),
                      xaxis = "x",
                      reverse.axis.values = getShinyOption("reverse.axis.values"))
-  })# end sectionX
+  }, ignoreNULL = ( ! getShinyOption("run.plots")) ) # end sectionX
   
   output$sectionXplot <- plotly::renderPlotly({sectionXplot()})
   
@@ -939,31 +971,46 @@ app_server <- function(input, output, session) {
   )
   
   # : Y section plot ----
-  goButtonY <- reactive({
-    req(input$class.variable, input$class.values,  input$sectionY.y.val)
-    if( (input$goButtonY > 0) | getShinyOption("run.plots")  ){
-      TRUE
-    } else { return() }
-  })
-  
-  sectionYplot <- shiny::eventReactive(goButtonY(), {
+  sectionYplot <- shiny::eventReactive(input$goButtonY, {
+    req(init.values, objects.subdataset)
     dataset <- objects.subdataset()
+    
+    if(is.null(input$sectionY.y.val)){
+      sectionY.x.val <- init.values()$valuesYx
+      sectionY.y.val <- init.values()$valuesYy
+    } else{
+      sectionY.x.val <- input$sectionY.x.val  
+      sectionY.y.val <- input$sectionY.y.val  
+    }
+    
+    sel <- (dataset$y >= sectionY.y.val[1] & dataset$y <= sectionY.y.val[2]) &
+      (dataset$x >= sectionY.x.val[1] & dataset$x <= sectionY.x.val[2])
+    
+    if(is.null(input$sectionY.point.size)){
+      sectionY.point.size <- getShinyOption("params")$point.size
+    } else{
+      sectionY.point.size <- input$sectionY.point.size
+    }
 
-    sel <- (dataset$y >= input$sectionY.y.val[1] & dataset$y <= input$sectionY.y.val[2]) &
-      (dataset$x >= input$sectionY.x.val[1] & dataset$x <= input$sectionY.x.val[2])
+    # sel <- (dataset$y >= input$sectionY.y.val[1] & dataset$y <= input$sectionY.y.val[2]) &
+    #   (dataset$x >= input$sectionY.x.val[1] & dataset$x <= input$sectionY.x.val[2])
+    
+    # add refits:
+    section.y.refits <- sum(c(input$sectionY.refits,
+                              getShinyOption("params")$sectionY.refits))
     
     .do_section_plot(selection = sel,
                      dataset = dataset, 
-                     section.point.size = input$sectionY.point.size,
+                     section.point.size = sectionY.point.size,
                      refitting.df = refitting.df, # this is the reactive output
-                     show.refits = input$sectionY.refits, 
+                     show.refits = section.y.refits, 
                      colors = colors.list(), 
                      grid.coord = grid.coordx(),
                      coords = coords.min.max(),
                      axis.labels = axis.labels(), 
                      xaxis = "y",
                      reverse.axis.values = getShinyOption("reverse.axis.values"))
-  }) #end section Y
+  }, ignoreNULL = ( ! getShinyOption("run.plots")) ) # end section Y
   
   output$sectionYplot <- plotly::renderPlotly({sectionYplot()})
   
@@ -976,21 +1023,13 @@ app_server <- function(input, output, session) {
       htmlwidgets::saveWidget(sectionYplot(), file = file3)
     }
   )
-  
-  # : Map plot ####
-  # goButtonZ <- reactive({
-  #   req(input$class.variable, input$class.values, input$map.density)
-  #   if( (input$goButtonZ > 0) | getShinyOption("run.plots")  ){
-  #     TRUE
-  #   } else { return() }
-  # })
-  
-  
+ # : Map plot ----
   map <- eventReactive(input$goButtonZ, {
-    req(init.valuesZ)   
+    req(init.values)   
+    
     dataset <- objects.subdataset()
     if(is.null(input$map.z.val)){
-      valuesZ <- init.valuesZ()
+      valuesZ <- init.values()$valuesZ
     } else{
       valuesZ <- input$map.z.val
     }
@@ -998,92 +1037,35 @@ app_server <- function(input, output, session) {
     
     planZ.df <- dataset[sel, ]
     
+    if(is.null(input$map.point.size)){
+      map.point.size <- getShinyOption("params")$point.size
+    } else{
+      map.point.size <- input$map.point.size
+    }
+    
     color.var <- group.variable()
     planZ.df[, color.var] <- as.character(planZ.df[, color.var])
     col <- unique(planZ.df[, c("layer_color", color.var)])
     col <- col[order(col[, 2]), ]
     col <- as.character(col$layer_color)
     
-    map <- site.map() +
-      geom_point(data = planZ.df,
-                 aes(x = .data[["x"]], y = .data[["y"]],
-                     color = .data[[color.var]],
-                     square = .data[["square"]], 
-                     xyz = .data[["xyz"]],
-                     object_type = .data[["object_type"]],
-                     location_mode = .data[["location_mode"]],
-                     id = .data[["id"]]
-                 ),
-                 size = input$map.point.size / 10
-      ) +
-      scale_color_manual(color.var, values = col)
-    
-    if(! is.null(input$map.density)){
-      if(input$map.density == "by.variable"){
-        # only layers with > 30 points
-        var.sel1 <- eval(parse(text = paste0("planZ.df$", color.var)))
-        var.sel2 <- table(var.sel1)
-        var.sel2 <- names(var.sel2[var.sel2 >= 30])
-        ids <- var.sel1  %in% var.sel2
-        planZ.df.sub <- planZ.df[ids, ]
-        
-        map <- map +
-          geom_density2d(data=planZ.df.sub,
-                         aes(x = .data[["x"]], y = .data[["y"]],
-                             group = .data[[color.var]],
-                             color = .data[[color.var]]),
-                         size = .2)
-      }
-      
-      if(input$map.density == "overall"){
-        map <- map +
-          geom_density2d(data=planZ.df,
-                         aes(x = .data[["x"]], y = .data[["y"]]),
-                         size = .2, color = "grey30")
-      }
-    }
-    
-    # add refits:
+    # check whether to show refits:
     map.refits <- sum(c(input$map.refits,
                         getShinyOption("params")$map.refits))
-    map.refits
-    if( map.refits > 0 ){
-      refitting.df <- refitting.df()
-      refitting.df <- refitting.df$refits.2d
-      
-      sel <- (refitting.df[, 1] %in% planZ.df$id) | (refitting.df[, 2] %in% planZ.df$id)
-      refitting.df <- refitting.df[which(sel), ]
-      
-      if(nrow(refitting.df) > 1){
-        # refitting.df <- cbind(
-        #   refitting.df[seq(1, nrow(refitting.df)-1, by=2), c("x", "y")],
-        #   refitting.df[seq(2, nrow(refitting.df),   by=2), c("x", "y")])
-        # colnames(refitting.df) <- c("x", "y", "xend", "yend")
-        
-        map <- map +
-          geom_segment(data = refitting.df,
-                       aes(x = .data[["x"]], xend = .data[["xend"]],
-                           y = .data[["y"]], yend = .data[["yend"]]),
-                       color = "red", linewidth=.3 )
-      }
-    }
     
-    map <- ggplotly(map, tooltip = c("id", "xyz", "square",
-                                     "location_mode", "object_type"),
-                    source = "B") 
+    do_map_plot(site.map(), planZ.df,
+                map.point.size, color.var, col,
+                input$map.density,
+                map.refits, refitting.df())
     
-    plotly::config(map,
-                   displaylogo = FALSE,  
-                   toImageButtonOptions = list(format = "svg",
-                                               filename = "archeoviz-map",
-                                               width = 600, height = 600))
-  },  ignoreNULL = ( ! getShinyOption("run.plots")) )
+  }, ignoreNULL = ( ! getShinyOption("run.plots"))
+  )   # end eventReactive
   
   output$map <- plotly::renderPlotly({ map() })
   
   map.click.selection <- reactive(plotly::event_data("plotly_click", source="B"))
   
-  #  : html export: Map  ----
+  # : html export: Map  ----
   output$download.map.plot <- downloadHandler(
     filename = paste0(gsub(" ", "-", shiny::getShinyOption("title")), "-map.html"),
     content = function(file2) {
@@ -1114,18 +1096,47 @@ app_server <- function(input, output, session) {
                 step=.1)
   })
   
-  # : slider Z  ----
+  # : init values 
   
-  init.valuesZ <- reactive({
+  init.values <- reactive({
+    coords <- coords.min.max()
+    
+    if( ! is.null(getShinyOption("params")$sectionX.x.val) ){
+      valuesXx <- getShinyOption("params")$sectionX.x.val
+    } else{
+      valuesXx <- c(coords$xmin, coords$xmax)
+    }
+    
+    if( ! is.null(getShinyOption("params")$sectionX.y.val) ){
+      valuesXy <- getShinyOption("params")$sectionX.y.val
+    } else{
+      valuesXy <- summary(seq(coords$ymin, coords$ymax))[c(2, 3)]
+    }
+    
+    if( ! is.null(getShinyOption("params")$sectionY.x.val) ){
+      valuesYx <- getShinyOption("params")$sectionY.x.val
+    } else{
+      valuesYx <- summary(seq(coords$xmin, coords$xmax))[c(2, 3)]
+    }
+    
+    if( ! is.null(getShinyOption("params")$sectionY.y.val) ){
+      valuesYy <- getShinyOption("params")$sectionY.y.val
+    } else{
+      valuesYy <- c(coords$ymin, coords$ymax)
+    }
+    
     if( ! is.null(getShinyOption("params")$map.z.val) ){
       valuesZ <- getShinyOption("params")$map.z.val
     } else{
-      coords <- coords.min.max()
       valuesZ <-summary(seq(coords$zmin, coords$zmax))[c(2, 3)]
     }
-    valuesZ
+    
+    list("valuesXx" = valuesXx, "valuesXy" = valuesXy,
+         "valuesYx" = valuesYx, "valuesYy" = valuesYy,
+         "valuesZ" = valuesZ)
   })
   
+  # : slider Z  ----
   output$sliderMap <- renderUI({
     coords <- coords.min.max()
     
@@ -1133,81 +1144,44 @@ app_server <- function(input, output, session) {
                 min = min(coords$zmin, coords$zmax), 
                 max = max(coords$zmin, coords$zmax),
                 round = T,
-                value = init.valuesZ()
+                value = init.values()$valuesZ
     )
   })
   
   # : sliders X  ----
+  
   output$sliderXx <- renderUI({
     coords <- coords.min.max()
     
-    if( ! is.null(getShinyOption("params")$sectionX.x.val) ){
-      init.valuesXx <- getShinyOption("params")$sectionX.x.val
-    } else{
-      init.valuesXx <- c(coords$xmin, coords$xmax)
-    }
-    
-    sliderInput("sectionX.x.val", "X: min/max", width="100%", sep = "", step=1,
+    sliderInput("sectionX.x.val", "X: min/max", width="100%", sep = "",step=1,
                 min = coords$xmin, max = coords$xmax, round=T,
-                value = init.valuesXx
-    )
-  })
-  
-  init.valuesXy <- reactive({
-    if( ! is.null(getShinyOption("params")$sectionX.y.val) ){
-      valuesXy <- getShinyOption("params")$sectionX.y.val
-    } else{
-      coords <- coords.min.max()
-      valuesXy <- summary(seq(coords$ymin, coords$ymax))[c(2, 3)]
-    }
-    valuesXy
+                value = init.values()$valuesXx)
   })
   
   output$sliderXy <- renderUI({
-    req(coords.min.max)
     coords <- coords.min.max()
     
     sliderInput("sectionX.y.val", "Y: min/max", width="100%", sep = "", step=1,
                 min = coords$ymin, max = coords$ymax, round=T,
-                value = init.valuesXy()
-    )
+                value = init.values()$valuesXy)
   })
   
   # : sliders Y  ----
-  init.valuesYx <- reactive({
-    if( ! is.null(getShinyOption("params")$sectionY.x.val) ){
-      init.valuesYx <- getShinyOption("params")$sectionY.x.val
-    } else{
-      coords <- coords.min.max()
-      init.valuesYx <- summary(seq(coords$xmin, coords$xmax))[c(2, 3)]
-    }
-    init.valuesYx
-  })
   
   output$sliderYx <- renderUI({
-    req(coords.min.max)
     coords <- coords.min.max()
     
     sliderInput("sectionY.x.val", "X: min/max", width="100%", sep = "", step=1,
                 min = coords$xmin, max = coords$xmax, round=T,
-                value = init.valuesYx()
-    )
+                value = init.values()$valuesYx)
   })
   
-
   output$sliderYy <- renderUI({
     coords <- coords.min.max()
     
-    if( ! is.null(getShinyOption("params")$sectionY.y.val) ){
-      init.valuesYy <- getShinyOption("params")$sectionY.y.val
-    } else {
-      init.valuesYy <- c(coords$ymin, coords$ymax)
-    }
-    
-    sliderInput("sectionY.y.val", "Y: min/max",  width="100%",  sep = "", step=1,
+    sliderInput("sectionY.y.val", "Y: min/max", width="100%", sep = "", step=1,
                 min = coords$ymin, max = coords$ymax, round=T,
-                value = init.valuesYy
-    )
+                value = init.values()$valuesYy)
   })
   
   # : slider timeline  ----
@@ -1247,7 +1221,14 @@ app_server <- function(input, output, session) {
     if(is.null(input$class.values)) {
       selected.value <- .term_switcher("all")
     } else if( ! is.null(getShinyOption("params")$class.values)){
-      selected.value <- getShinyOption("params")$class.values
+      if(sum(getShinyOption("params")$class.values %in% values) > 0 ){
+        param.list <-  getShinyOption("params")
+        selected.value <- param.list$class.values
+        param.list$class.values <- NULL # reset default value
+        shinyOptions("params" =  param.list)
+      } else{
+        selected.value <- .term_switcher("all")
+      }
     } else {
       selected.value <- input$class.values
     }
@@ -1310,8 +1291,7 @@ app_server <- function(input, output, session) {
                      .term_switcher("show.uncertainty"))
     }
     
-    loc.selection <- .term_switcher(tolower(unique(df$location_mode)[1]))
-    loc.selection <- tolower(unique(df$location_mode)[1])
+    loc.selection <- tolower(sort(unique(df$location_mode))[1])
     if( ! is.null(getShinyOption("params")$location)){
       loc.selection <- getShinyOption("params")$location
     }
@@ -1404,6 +1384,205 @@ app_server <- function(input, output, session) {
     downloadButton("download.timeline.map", .term_switcher("download"))
   })
   
+  # : slider 3D point size ----
+  output$plot3d.point.size <- renderUI({
+    sliderInput("point.size", .term_switcher("point.size"),
+                width="100%", sep = "",
+                min=1, max=5, step=1,
+                getShinyOption("params")$point.size)
+  })
+  # : slider map point size ----
+  output$map.point.size <- renderUI({
+    sliderInput("map.point.size", .term_switcher("point.size"),
+                width="100%", sep = "",
+                min=1, max=8, step=1, 
+                value = getShinyOption("params")$point.size)
+  })
+  # : slider sec.X point size ----
+  output$sectionX.point.size <- renderUI({
+    sliderInput("sectionX.point.size", .term_switcher("point.size"),
+                width="100%", sep = "",
+                min=1, max=10, step=1,
+                value = getShinyOption("params")$point.size)
+  })
+  # : slider sec.Y point size ----
+  output$sectionY.point.size <- renderUI({
+    sliderInput("sectionY.point.size", .term_switcher("point.size"),
+                width="100%", sep = "",
+                min=1, max=10, step=1,
+                value = getShinyOption("params")$point.size)
+  })
+  
+  # Exports ----
+  
+  
+  # : seriograph   ----
+  
+  seriograph.table <- reactive({
+    req(input$class.variable, objects.subdataset)
+    
+    if( (Sys.getenv('SHINY_PORT') == "") |
+        (! getShinyOption("table.export")) ){ return() }
+    
+    dataset <- objects.subdataset()
+    
+    df <- table(dataset$layer,
+                eval(parse(text = paste0("dataset$", input$class.variable))))
+    
+    if(dim(df)[1] == 1 | dim(df)[2] == 1){ return() }
+    
+    df <- as.matrix(df)
+    as.data.frame.matrix(df)
+  })
+  
+  
+  output$download.seriograph <- downloadHandler(
+    filename = "seriograph.csv",
+    content = function(file) {
+      write.csv(seriograph.table(), file, row.names = TRUE)
+    }
+  )
+  
+  
+  seriograph.url <- reactive({
+    req(seriograph.table())
+    
+    data.url <- session$registerDataObj(name = "table",
+                                        data = seriograph.table(),
+                                        filterFunc = function(data, req) { 
+                                          httpResponse(200, "text/csv",
+                                            write.csv(data, row.names = TRUE)
+                                          )
+                                        })
+    object.id <- gsub(".*w=(.*)&nonce.*", "\\1", data.url)
+    
+    data.url <- paste0(session$clientData$url_protocol, "//",
+                       session$clientData$url_hostname,
+                       session$clientData$url_pathname,
+                       "_w_", object.id, 
+                       "/session/", session$token, "/download/download.seriograph")
+    
+    paste0("https://analytics.huma-num.fr/ModAthom/seriograph/?data=", data.url)
+  })
+
+  
+  # seriograph link
+  output$run.seriograph <- renderUI({
+    req(seriograph.url())
+    
+    tagList(
+      "> ", .term_switcher("export.to"),
+      actionLink("run.seriograph",
+                 label = "Seriograph",
+                 onclick = paste("window.open('",
+                                 seriograph.url(), "', '_blank')")),
+    "(", .term_switcher("download"),
+    downloadLink("download.seriograph", " CSV"),  ")"
+    )
+  })
+  
+  # : archeofrag ----
+  
+  archeofrag.tables <- reactive({
+    req(input$class.variable, objects.dataset(), refitting.df())
+  
+    if( (Sys.getenv('SHINY_PORT') == "") |
+        (! getShinyOption("table.export")) ){ return() }
+    
+    refits.df <- refitting.df()[[3]]
+    
+    dataset <- objects.dataset()
+    dataset <- dataset[, c("id", "layer")]
+    
+    if( (nrow(refits.df) == 0) | (length(unique(dataset$layer)) < 2) ){return()}
+    
+    refits.df <- refits.df[refits.df[,1] %in% dataset[,1], ]
+    refits.df <- refits.df[refits.df[,2] %in% dataset[,1], ]
+    
+    list("edges" = refits.df, "objects" = dataset)
+  })
+  
+  
+  output$download.archeofrag.edges <- downloadHandler(
+    filename = "archeofrag-edges.csv",
+    content = function(file) {
+      write.csv(archeofrag.tables()[[1]], file, row.names = FALSE)
+    }
+  )
+  output$download.archeofrag.nodes <- downloadHandler(
+    filename = "archeofrag-nodes.csv",
+    content = function(file) {
+      write.csv(archeofrag.tables()[[2]], file, row.names = FALSE)
+    }
+  )
+  
+  
+  archeofrag.url <- reactive({
+    req(archeofrag.tables())
+    # edges
+    edges.url <- session$registerDataObj(name = "table",
+                                         data = archeofrag.tables()[[1]],
+                                         filterFunc = function(data, req) { 
+                                           httpResponse(200, "text/csv",
+                                            write.csv(data, row.names=FALSE)
+                                           )
+                                         })
+    object.id2 <- gsub(".*w=(.*)&nonce.*", "\\1", edges.url)
+    
+    edges.url <- paste0(session$clientData$url_protocol, "//",
+                        session$clientData$url_hostname,
+                        session$clientData$url_pathname,
+                        "_w_", object.id2, 
+                        "/session/", session$token, "/download/download.archeofrag.edges")
+    
+    # nodes 
+      nodes.url <- session$registerDataObj(name = "table",
+                                           data = archeofrag.tables()[[2]],
+                                           filterFunc = function(data, req) { 
+                                             httpResponse(200, "text/csv",
+                                                          write.csv(data, row.names = FALSE)
+                                             )
+                                           })
+      object.id <- gsub(".*w=(.*)&nonce.*", "\\1", nodes.url)
+      
+      nodes.url <- paste0(session$clientData$url_protocol, "//",
+                          session$clientData$url_hostname,
+                          session$clientData$url_pathname,
+                          "_w_", object.id, 
+                          "/session/", session$token, "/download/download.archeofrag.nodes")
+    
+    paste0("https://analytics.huma-num.fr/Sebastien.Plutniak/archeofrag/?objects=", nodes.url, "&relations=", edges.url)
+  })
+  
+  output$run.archeofrag <- renderUI({
+    req(archeofrag.url())
+    
+    tagList(
+      "> ", .term_switcher("export.to"),
+      actionLink("run.archeofrag",
+                 label = "Archeofrag",
+                 onclick = paste("window.open('",
+                                 archeofrag.url(), "', '_blank')")),
+      "    (", .term_switcher("download"),
+      downloadLink("download.archeofrag.edges", " CSV-1"),
+      ", ",
+      downloadLink("download.archeofrag.nodes", " CSV-2"),
+      ")"
+    )
+  })
+  
+  
+  # : Export ui header ----
+  output$export.header <- renderUI({
+    if(
+      ( (Sys.getenv('SHINY_PORT') != "") & # only if remote use of the app 
+        ( getShinyOption("table.export")) ) &
+      ( isTruthy(seriograph.table) | isTruthy(archeofrag.tables) ) ){
+      h4(.term_switcher("header.export.data"))
+    } else{  return() }
+  })
+  
+  
   #  Reproducibility ----
   
   output$reproducibility <- reactive({
@@ -1411,21 +1590,21 @@ app_server <- function(input, output, session) {
     class.values <- input$class.values
     
     if(length(input$class.values) == 1){
-      class.values <- paste0("\"", class.values, "\"")
+      class.values <- paste0("'", class.values, "'")
     }
     if(sum(input$class.values == .term_switcher("all"))){
       class.values <-  NULL
     }
     
-    reactive.params <- list("home.text" = "\" \"",
+    reactive.params <- list("home.text" = "' '",
                          "add.x.square.labels" = getShinyOption("add.x.square.labels"),
                          "add.y.square.labels" = getShinyOption("add.y.square.labels"),
-                         "class.variable" = paste0("\"", input$class.variable, "\""),
+                         "class.variable" = paste0("'", input$class.variable, "'"),
                          "class.values" = class.values, 
-                         "default.group" = paste0("\"", input$group.selection, "\""),
-                         "location.mode" = paste0("\"", input$location, "\""),
+                         "default.group" = paste0("'", input$group.selection, "'"),
+                         "location.mode" = paste0("'", input$location, "'"),
                          "map.z.val" = input$map.z.val,
-                         "map.density" = paste0("\"", input$map.density, "\""),
+                         "map.density" = paste0("'", input$map.density, "'"),
                          "map.refits" = input$map.refits,
                          "plot3d.ratio" = input$plot3d.ratio,
                          "plot3d.hulls" = input$plot3d.hulls,
@@ -1445,6 +1624,7 @@ app_server <- function(input, output, session) {
   #  Timeline ----
   #  : main timeline ----
   timeline.map.plot <- reactive({
+    
     req(timeline.data)
     
     time.df <- timeline.data()

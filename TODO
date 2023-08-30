@@ -4,22 +4,42 @@
 
 ## bugs 
 
+* Statistiques / le tableau "variable", lorsqu'utilisé avec "fuzzy" + "exact" modifie les rownames (ajoute des points dans les espaces)
 * bug dans la génération des svg pour les profils (les lignes qui délimitent la figure sont décalées)
 * Densité 2D : erreurs occasionnelles lorsqu'impossibilité de générer les courbes de densité
-* Cassenade : plot 3D, hull + refits : impossible de bouger la visuation 3D
-* run.plots ne fonctionne pas pour maps
-* test.do_refits_preprocessing.R  : fail in Github Action Ubunto :https://github.com/sebastien-plutniak/archeoviz/actions/runs/5180918673/jobs/9335737589
+* Cassenade : plot 3D, hull + refits : impossible de bouger la visualisation 3D
 
 ## simple enhancements
 
 * bouton Lancer / Rafraîchir
 * add test for: reverse.axis.values,  reverse.square.names, do_r_command, .do_square_list
 * améliorer les labels pour les adapter lors de la représentation de grandes surfaces
+* voir si le slider de timeline peut gérer des dates (et non des nombres)
+* employer les données 3D "volcano"  pour voir le comportement de convex hull et reression surface pour représenter des surfaces (ex : structures en creux)
 
 ## new features
 
+* permettre de croiser 2 variables dans les visualisations en employant couleur et symboles
+* permettre la timeline par mois ou par jours. Limite: implique une dépendance à shinyWidgets::sliderTextInput()
+	https://stackoverflow.com/questions/40392676/r-shiny-date-slider-animation-by-month-currently-by-day/40402610#40402610
+		if(sum(grepl("^[0-9]{4}$", timeline.df$year)) == nrow(timeline.df)){
+		  timeline.df$year <- paste0(timeline.df$year, "-01-01")
+		  step <- 365
+		  timeFormat <- "%Y"
+		} else if(sum(grepl("^.*-.*$", timeline.df$year)) == nrow(timeline.df)){
+		  timeline.df$year <- paste0(timeline.df$year, "-01")
+		  step <- 30
+		  timeFormat <- "%Y-%m"
+		} else if(sum(grepl("^.*-.*-.*$", timeline.df$year)) == nrow(timeline.df)){
+		  step <- 1
+		  timeFormat <- "%Y-%m-%d"
+		}
+		timeline.df$year <- as.Date(timeline.df$year)
+		
+* modifier l'interface pour clarifier que les remontages sont aussi des fabriques
+* analyse des orientations des remontages / fabrique
 * rendre possible le rearrangement des labels de carré : square_x, square_x_order, square_y, square_y_order
-* permettre de plotter les surfaces (suggestion D Giusti) 
+* permettre de plotter les surfaces (suggestion D Giusti) ; voir tests de Gainesville avec Nico
 * calculer des surfaces d'interface entre couches
 * étendre les paramètres possibles en URL : toute la listes des "params" + les shinyOptions.
   interfaçage / openarcheo ou nakala: faire qu'il soit possible de lancer avec une url une instance archeoviz mettant en evidence un objet.
@@ -59,6 +79,8 @@ DONE:
 	
 	
 # portal
+
+* ajouter Wikidata
 * revoir la structure de l'arborescence sur le serveur huma-num, en utilisant le parametre path de load_all() pour n'avoir qu'une copie du package
 * ajouter une rubrique “variables” (type et description), voir l'exemple de tDAR, récupérant les données dans le tableau metadata.csv
 	soit 1 colonne par variable (contenant alors les 3 champs : name, type, description)
@@ -87,5 +109,43 @@ Deux variables sont à documenter dans le tableau metadata.csv
 * n.remains.in.refitting.set : nombre de fragments étant inclus dans des ensembles de remontages
 
 Parti pris : les fragments inclus dans des ensembles de remontage ne comprenant que 2 fragments sont considérés comme des "refits" (puisqu'il n'y a pas d'ambiguité à propos de la composition des paires de fragmentes remontables)
+
+
+
+
+
+
+
+
+
+df <- demo_objects_data(30)
+df <- df[ , c("id", "xmin", "ymin", "zmin", "layer", "object_type")]
+
+
+df1 <- expand.grid(xmin = 1:51, ymin = 1:51)
+df1$zmin <-  trunc(apply(df1, 1, function(x) sqrt((median(df1[, 1]) - x[1])^2 + (median(df1[, 2]) - x[2])^2)))
+df1$zmin <- max(df1$zmin) - df1$zmin
+df1$layer <- "structure1"
+df1$object_type <- "hole1"
+df1$id <- ""
+
+df2 <- expand.grid(xmin = 1:51, ymin = 1:51)
+df2$zmin <-  trunc(apply(df2, 1, function(x) sqrt(( median(df2[, 1]) - x[1])^2 + (median(df2[, 2]) - x[2])^2))) 
+df2 <- df2 + 100
+df2$zmin <- max(df2$zmin) - df2$zmin + 50
+df2$layer <- "structure2"
+df2$object_type <- "hole2"
+df2$id <- ""
+
+df <- rbind(df1, df2)
+df$id <- 1:nrow(df)
+
+archeoViz::archeoViz(objects.df = df,      # data.frame with data about the objects
+                     refits.df = NULL,       # (optional) data.frame for refitting data
+                     timeline.df = NULL,     # (optional) data.frame for the excavation timeline
+                     title = NULL,           # title of the site / data set
+                     home.text = NULL,       # html content to display on the home page
+                     lang = "fr",            # language of the app interface
+                     set.theme = "simplex")  # graphic theme for the Shiny interface
 
 

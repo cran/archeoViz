@@ -120,8 +120,7 @@ ui <- shinyUI(
                             checkboxInput("plot3d.hulls", .term_switcher("hulls"),
                                           value = getShinyOption("params")$plot3d.hulls ),
                             uiOutput("show.3d.refits"),
-                            sliderInput("point.size", .term_switcher("point.size"), width="100%", sep = "",
-                                        min=1, max=5, value=2, step=1),
+                            uiOutput("plot3d.point.size"),
                             uiOutput("ratio3D"), 
                             uiOutput("download.button.html.export.3d")
                      )  # end column
@@ -145,9 +144,7 @@ ui <- shinyUI(
                             br(), br(),
                             uiOutput("density_selector"),
                             uiOutput("show.map.refits"),
-                            sliderInput("map.point.size", .term_switcher("point.size"),
-                                        width="100%", sep = "",
-                                        min=1, max=10, value=2, step=1),
+                            uiOutput("map.point.size"),
                             uiOutput("download.button.html.export.map")
                             )#end column
                    ), #end fluid row
@@ -158,7 +155,7 @@ ui <- shinyUI(
                    )) # end colums, end fluidrow                   
           ), # end tabPanel
 
-          tabPanel("Section X",  # section X ----
+          tabPanel(.term_switcher("tab.section.x"),  # section X ----
                    fluidRow(
                      column(10,
                             uiOutput("sliderXx"),
@@ -173,9 +170,7 @@ ui <- shinyUI(
                      ),
                      column(3, align="center",
                             uiOutput("show.sectionX.refits"),
-                            sliderInput("sectionX.point.size", .term_switcher("point.size"),
-                                        width="100%", sep = "",
-                                        min=1, max=10, value=5, step=1),
+                            uiOutput("sectionX.point.size"),
                             downloadLink("downloadMinimapX", 
                                          paste(.term_switcher("download"),
                                                tolower(.term_switcher("tab.map"))) ),
@@ -191,7 +186,7 @@ ui <- shinyUI(
                    )) # end colums, end fluidrow   
           ), # end tabPanel
 
-          tabPanel("Section Y",  #section Y ----
+          tabPanel(.term_switcher("tab.section.y"),  #section Y ----
                    fluidRow(
                      column(10,
                             uiOutput("sliderYx"),
@@ -206,9 +201,7 @@ ui <- shinyUI(
                      ),
                      column(3, align="center",
                             uiOutput("show.sectionY.refits"),
-                            sliderInput("sectionY.point.size", .term_switcher("point.size"),
-                                        width="100%", sep = "",
-                                        min=1, max=10, value=5, step=1),
+                            uiOutput("sectionY.point.size"),
                             downloadLink("downloadMinimapY", 
                                          paste(.term_switcher("download"),
                                                tolower(.term_switcher("tab.map"))) ),
@@ -224,7 +217,15 @@ ui <- shinyUI(
                    )) # end colums, end fluidrow  
           ), # end tabPanel
 
-          tabPanel(.term_switcher("tab.tables"),  #  tables ----
+          tabPanel(.term_switcher("tab.statistics"),  #  statistics ----
+                   fluidRow(
+                     column(6,
+                            uiOutput("export.header"),
+                            uiOutput("run.seriograph"),
+                            uiOutput("run.archeofrag"),
+                            br()
+                     )
+                   ),
                    fluidRow(
                      column(6,
                             h4(.term_switcher("tab.variable.loc")),

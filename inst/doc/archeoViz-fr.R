@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 #                                 # par couche ("by.layer") ou "by.variable"
 #            title = NULL,        # titre du site / du jeu de données
 #            home.text = NULL,    # contenu HTML à afficher sur la page d'accueil
-#            lang = "fr"          # langue de l'interface ("en": Anglais, "fr": Français, "it": Italien "pt": Portugais)
+#            lang = "fr"          # langue de l'interface ("de": Allemand, "en": Anglais, "fr": Français, "it": Italien "pt": Portugais, "es": Espagnol)
 #            set.theme = "cosmo") # thème graphique de l'interface Shiny
 
 ## ---- eval=FALSE--------------------------------------------------------------
@@ -41,10 +41,11 @@ knitr::opts_chunk$set(
 #            default.group = "by.layer", location.mode = NULL,
 #            map.z.val = NULL, map.density = "no", map.refits = NULL,
 #            plot3d.ratio = 1, plot3d.hulls = NULL, plot3d.surfaces = NULL, plot3d.refits = NULL,
+#            point.size = 2,
 #            sectionX.x.val = NULL, sectionX.y.val = NULL, sectionX.refits = NULL,
 #            sectionY.x.val = NULL, sectionY.y.val = NULL, sectionY.refits = NULL,
 #            camera.center = c(0, 0, 0), camera.eye = c(1.25, 1.25, 1.25),
-#            run.plots = FALSE, html.export = TRUE
+#            run.plots = FALSE, html.export = TRUE, table.export =TRUE
 #            )
 
 ## ---- eval=FALSE--------------------------------------------------------------

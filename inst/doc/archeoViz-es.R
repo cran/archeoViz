@@ -5,31 +5,32 @@ knitr::opts_chunk$set(
 )
 
 ## ---- eval=FALSE--------------------------------------------------------------
-#  # set the working directory on your shiny server:
+#  # configure el directorio de trabajo en su servidor Shiny:
 #  setwd(dir = "/some/path/")
-#  # download the package:
-#  download.file(
-#    url = "https://github.com/sebastien-plutniak/archeoviz/archive/master.zip",
-#    destfile = "archeoviz.zip")
-#  # unzip it:
+#  # descargar el package:
+#  download.file(url = "https://github.com/sebastien-plutniak/archeoviz/archive/master.zip",
+#                destfile = "archeoviz.zip")
+#  # unzip:
 #  unzip(zipfile = "archeoviz.zip")
 
 ## ---- eval=FALSE--------------------------------------------------------------
-#  archeoViz(objects.df = NULL,   # data.frame with data about the objects
-#            refits.df = NULL,    # optional data.frame for refitting data
-#            timeline.df = NULL,  # optional data.frame for the excavation timeline
-#            title = NULL,        # title of the site / data set
-#            home.text = NULL,    # HTML content to display on the home page
-#            lang = "en"          # interface language ("de": German, "en": English, "fr": French, "it": Italian, "pt": Portuguese, "es": Spanish)
-#            set.theme = "cosmo") # graphic theme for the Shiny interface
+#  archeoViz(objects.df = NULL,   # data.frame con datos sobre los objetos
+#            refits.df = NULL,    # data.frame opcional para reinstalar datos
+#            timeline.df = NULL,  # data.frame opcional para la cronología de excavación
+#            default.group =NULL, # méthode de groupement des données,
+#                                 # par couche ("by.layer") ou "by.variable"
+#            title = NULL,        # titulo del sitio / data set
+#            home.text = NULL,    # Contenido HTML para mostrar en la página de inicio
+#            lang = "fr"          # lenguaje de interfaz ("en": Inglés, "fr": Francés, "it": Italiano, "pt": Portugués, "es": Español)
+#            set.theme = "cosmo") # tema gráfico para la interfaz Shiny
 
 ## ---- eval=FALSE--------------------------------------------------------------
 #  archeoViz()
 
 ## ---- eval=FALSE--------------------------------------------------------------
-#  archeoViz(objects.df = NULL,  # data.frame with data about the objects
-#            refits.df = NULL,   # data.frame for refitting objects
-#            timeline.df = NULL) # optional data.frame for the excavation timeline
+#  archeoViz(objects.df = NULL,  # data.frame con datos sobre los objetos
+#            refits.df = NULL,   # data.frame para reacondicionar objetos
+#            timeline.df = NULL) # data.frame opcional para la cronología de excavación
 
 ## ---- eval=FALSE--------------------------------------------------------------
 #  archeoViz(objects.df=NULL, refits.df=NULL, timeline.df=NULL,
@@ -44,7 +45,7 @@ knitr::opts_chunk$set(
 #            sectionX.x.val = NULL, sectionX.y.val = NULL, sectionX.refits = NULL,
 #            sectionY.x.val = NULL, sectionY.y.val = NULL, sectionY.refits = NULL,
 #            camera.center = c(0, 0, 0), camera.eye = c(1.25, 1.25, 1.25),
-#            run.plots = FALSE, html.export = TRUE, table.export = TRUE
+#            run.plots = FALSE, html.export = TRUE, table.export =TRUE
 #            )
 
 ## ---- eval=FALSE--------------------------------------------------------------

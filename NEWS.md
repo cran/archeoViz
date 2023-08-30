@@ -1,3 +1,22 @@
+# archeoViz 1.3.1
+Released: 2023-08-29
+
+* Refits lines are colored based on the selected variable and values (same as the points).
+* Add the 'point.size' parameter to set the size of the points in the plots.
+* Fix issues in the refreshing of the plots / the 'run.plots' argument.
+* Add linguistic support for Spanish.
+
+# archeoViz 1.3.0
+Released: 2023-07-25
+
+* The 'Tables' tab is renammed 'Statistics'.
+* Add export links to third-party applications (the Seriograph and Archeofrag applications) in the 'Statistics' tab.
+* Add a 'table.export' parameter.
+
+# archeoViz 1.2.1
+Released: 2023-06-28
+
+* Add linguistic support for German.
 
 # archeoViz 1.2.0
 Released: 2023-06-07
@@ -7,7 +26,7 @@ Released: 2023-06-07
 # archeoViz 1.1.2
 Released: 2023-06-03
 
-* The display of the buttons to export the plots as html files can now be set to TRUE or FALSE with the 'export.html' parameter.
+* The display of the buttons to export the plots as HTML files can now be set to TRUE or FALSE with the 'export.html' parameter.
 * The small maps in the 'Section X' and 'Section Y' tabs can now be downloaded.
 
 # archeoViz 1.1.1
@@ -23,8 +42,8 @@ Released: 2023-05-04
 * In the '3D plot', only the refitting lines related to the objects included in the data subset are displayed.
 * Fixing issues in the generation of the R command in the 'reproducibility' tab.
 * Add a table with details about the clicked point in the 'Map', 'Section X', and 'Section Y' tabs (using knitr::kable(), what adds a dependency to knitr).
-* Add support for html in the tables displaying details about the clicked point.
-* Add buttons to export the plots as html widgets in the 'Map', 'Section X', and 'Section Y' tabs.
+* Add support for HTML in the tables showing details about the clicked point.
+* Add buttons to export the plots as HTML widgets in the 'Map', 'Section X', and 'Section Y' tabs.
 
 # archeoViz 1.0.1
 Released: 2023-03-03
@@ -35,7 +54,7 @@ Released: 2023-03-03
 Released: 2023-02-27 (on CRAN)
 
 * Add a 'Reproducibility' tab, generating an R command to launch archeoViz() with the current settings of the app.
-* In the '3D plot' tab, add a button to download the 3D plot widget as a .html file.
+* In the '3D plot' tab, add a button to download the 3D plot widget as HTML file.
 * Add 'Italian'/'it' as an option for the 'lang' parameter in the 'archeoViz()' function.
 * Various fixes, concerning the squares labels, the display of the summary tables.
 * Plot background is now adapted when using dark graphic themes (cyborg, darkly, slate).
