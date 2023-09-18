@@ -328,7 +328,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<p><code>archeoViz</code> is a packaged R Shiny application for the <em>visualisation</em>, <em>exploration</em>, and web <em>communication</em> of archaeological spatial data. It includes interactive 3D and 2D <em>visualisations</em>, can generate <em>cross sections</em> and <em>maps</em> of the remains, can run basic <em>spatial statistics</em> methods (convex hull, regression surfaces, 2D kernel density estimation), and display an interactive <em>timeline</em> of an excavation. <code>archeoViz</code> can be used locally or deployed on a server, either by allowing the user to load data through the interface or by running the app with a specific data set. The app interface is available in English, French, German, Italian, Portuguese, and Spanish.</p>
+<p><code>archeoViz</code> is a packaged R Shiny application for the <em>visualisation</em>, <em>exploration</em>, and web <em>communication</em> of archaeological spatial data. It includes interactive 3D and 2D <em>visualisations</em>, can generate <em>cross sections</em> and <em>maps</em> of the remains, can run basic <em>spatial statistics</em> methods (convex hull, regression surfaces, 2D kernel density estimation), and display an interactive <em>timeline</em> of an excavation. <code>archeoViz</code> can be used locally or deployed on a server, either by allowing the user to load data through the interface or by running the app with a specific data set. The app interface is available in English, French, German, Italian, Portuguese, Romanian, and Spanish.</p>
 <ul>
 <li><a href="#installation"><strong>Installation</strong></a>
 <ul>
@@ -345,8 +345,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <ul>
 <li><a href="#spatial-information-in-archeoviz">Spatial Information in archeoViz</a>
 <ul>
-<li><a href="#exact-location-plotted-objects">Exact Location: Plotted Objects</a></li>
-<li><a href="#vague-location-spits-buckets-sieved-objects-and-recording-errors">Vague Location: Spits, Buckets, Sieved Objects, and Recording Errors</a></li>
+<li><a href="#points-exact-location-plotted-objects">Points, Exact Location: Plotted Objects</a></li>
+<li><a href="#points-vague-location-spits-buckets-sieved-objects-and-recording-errors">Points, Vague Location: Spits, Buckets, Sieved Objects, and Recording Errors</a></li>
+<li><a href="#lines">Lines</a></li>
+<li><a href="#surfaces">Surfaces</a></li>
 </ul></li>
 <li><a href="#refittings-and-fabric-measurements">Refittings and Fabric Measurements</a>
 <ul>
@@ -406,6 +408,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><a href="#Software">Software</a></li>
 <li><a href="#papers">Papers</a></li>
 <li><a href="#presentations">Presentations</a></li>
+<li><a href="#websites">Websites</a></li>
 </ul></li>
 </ul>
 <div id="installation" class="section level1">
@@ -458,6 +461,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><a href="https://analytics.huma-num.fr/archeoviz/es"><code>archeoViz</code> in Spanish</a>.</li>
 <li><a href="https://analytics.huma-num.fr/archeoviz/it"><code>archeoViz</code> in Italian</a>.</li>
 <li><a href="https://analytics.huma-num.fr/archeoviz/pt"><code>archeoViz</code> in Portuguese</a>.</li>
+<li><a href="https://analytics.huma-num.fr/archeoviz/ro"><code>archeoViz</code> in Ruman</a>.</li>
 </ul>
 <p>Real use cases are presented on the <a href="https://analytics.huma-num.fr/archeoviz/home"><em>archeoViz Portal</em></a>.</p>
 </div>
@@ -486,18 +490,27 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="spatial-information-in-archeoviz" class="section level2">
 <h2>Spatial Information in archeoViz</h2>
 <p>Archaeologists record the location of archaeological objects at different scales and granularity. Accordingly, they use different geometrical concepts to represent location.</p>
-<div id="exact-location-plotted-objects" class="section level3">
-<h3>Exact Location: Plotted Objects</h3>
+<div id="points-exact-location-plotted-objects" class="section level3">
+<h3>Points, Exact Location: Plotted Objects</h3>
 <p>Using grid coordinates or electronic “total station” enables recording the individual location of objects on the field. In that case, the location are represented as points in <code>archeoViz</code> (triplets of x, y and z coordinates).</p>
 </div>
-<div id="vague-location-spits-buckets-sieved-objects-and-recording-errors" class="section level3">
-<h3>Vague Location: Spits, Buckets, Sieved Objects, and Recording Errors</h3>
+<div id="points-vague-location-spits-buckets-sieved-objects-and-recording-errors" class="section level3">
+<h3>Points, Vague Location: Spits, Buckets, Sieved Objects, and Recording Errors</h3>
 <p>However, it is also common that x, y, z, coordinates by object are not available, for different reasons due to:</p>
 <ul>
 <li>recording errors, loss of information, resulting in the need to replace one of several coordinates values by ranges (e.g., a X value is missing for an object and is replaced by the minimal and maximal X values of the square where this object was found);</li>
 <li>choice of method (e.g., excavation made and recorded using spits of arbitrary depth, sieved objects, etc.).</li>
 </ul>
 <p>In all these cases, we have to deal with vague location, when objects cannot be located as points but are somewhere between ranges of coordinates. Vague location can concern one, two, or the three spatial dimensions (the x, y, z coordinates, respectively).</p>
+<p>Note that this feature can also be used to deal with the imprecision of topographical instruments.</p>
+</div>
+<div id="lines" class="section level3">
+<h3>Lines</h3>
+<p>Lines are useful geometries for representing relationships. In archaeology, these can be <a href="#reffitings">refitting</a> relationships between object fragments, orientation (<a href="#fabric-measurements">fabric measurements</a>, etc. Lines are generated from data loaded as refitting data, either from the “Data” tab, or with the <code>refits.df</code> parameter of the <code>archeoViz()</code> function.</p>
+</div>
+<div id="surfaces" class="section level3">
+<h3>Surfaces</h3>
+<p>Surfaces are useful geometries for representing ground levels, trenches, pits, etc. In <code>archeoViz</code>, this can be achieved by defining a subset of points summarising the desired surface, then displaying the <a href="#convex-hulls">convex hull</a> of this subset.</p>
 </div>
 </div>
 <div id="refittings-and-fabric-measurements" class="section level2">
@@ -675,7 +688,13 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="convex-hulls" class="section level3">
 <h3>Convex hulls</h3>
-<p>In the “3D plot” tab, clicking on “Compute hulls” and “Validate” displays the convex hull associated with each layer (with at least 20 points). The convex hulls are computed using the <a href="https://CRAN.R-project.org/package=cxhull"><code>cxhull</code></a> package.</p>
+<p>In the “3D plot” tab, convex hulls can be displayed as follows:</p>
+<ol style="list-style-type: decimal">
+<li>tick the “Convex hulls” box,</li>
+<li>select, from the menu that appears, the subsets of points for which convex hulls are to be calculated,</li>
+<li>click on “Validate”.</li>
+</ol>
+<p>Convex hulls associated with each subsets with at least 20 points are displayed. The convex hulls are computed using the <a href="https://CRAN.R-project.org/package=cxhull"><code>cxhull</code></a> package.</p>
 </div>
 <div id="d-kernel-density" class="section level3">
 <h3>2D kernel density</h3>
@@ -723,8 +742,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <a class="sourceLine" id="cb8-5" data-line-number="5">          <span class="dt">class.variable =</span> <span class="ot">NULL</span>, <span class="dt">class.values =</span> <span class="ot">NULL</span>,</a>
 <a class="sourceLine" id="cb8-6" data-line-number="6">          <span class="dt">default.group =</span> <span class="st">&quot;by.layer&quot;</span>, <span class="dt">location.mode =</span> <span class="ot">NULL</span>,</a>
 <a class="sourceLine" id="cb8-7" data-line-number="7">          <span class="dt">map.z.val =</span> <span class="ot">NULL</span>, <span class="dt">map.density =</span> <span class="st">&quot;no&quot;</span>, <span class="dt">map.refits =</span> <span class="ot">NULL</span>,</a>
-<a class="sourceLine" id="cb8-8" data-line-number="8">          <span class="dt">plot3d.ratio =</span> <span class="dv">1</span>, <span class="dt">plot3d.hulls =</span> <span class="ot">NULL</span>, <span class="dt">plot3d.surfaces =</span> <span class="ot">NULL</span>, <span class="dt">plot3d.refits =</span> <span class="ot">NULL</span>,</a>
-<a class="sourceLine" id="cb8-9" data-line-number="9">          <span class="dt">point.size =</span> <span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb8-8" data-line-number="8">          <span class="dt">plot3d.ratio =</span> <span class="dv">1</span>, <span class="dt">plot3d.hulls =</span> <span class="ot">FALSE</span>, <span class="dt">hulls.class.values =</span> <span class="ot">NULL</span>,</a>
+<a class="sourceLine" id="cb8-9" data-line-number="9">          <span class="dt">plot3d.surfaces =</span> <span class="ot">NULL</span>, <span class="dt">plot3d.refits =</span> <span class="ot">NULL</span>, <span class="dt">point.size =</span> <span class="dv">2</span>,</a>
 <a class="sourceLine" id="cb8-10" data-line-number="10">          <span class="dt">sectionX.x.val =</span> <span class="ot">NULL</span>, <span class="dt">sectionX.y.val =</span> <span class="ot">NULL</span>, <span class="dt">sectionX.refits =</span> <span class="ot">NULL</span>, </a>
 <a class="sourceLine" id="cb8-11" data-line-number="11">          <span class="dt">sectionY.x.val =</span> <span class="ot">NULL</span>, <span class="dt">sectionY.y.val =</span> <span class="ot">NULL</span>, <span class="dt">sectionY.refits =</span> <span class="ot">NULL</span>,</a>
 <a class="sourceLine" id="cb8-12" data-line-number="12">          <span class="dt">camera.center =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="dt">camera.eye =</span> <span class="kw">c</span>(<span class="fl">1.25</span>, <span class="fl">1.25</span>, <span class="fl">1.25</span>),</a>
@@ -763,6 +782,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><strong>map.density</strong>: character. At the launch of the app, whether to compute and show density contours in the map plot (one of “no”, “overall”, “by.variable”).</li>
 <li><strong>map.refits</strong>: TRUE or FALSE. Whether to show refits in the map plot.</li>
 <li><strong>plot3d.hulls</strong>: TRUE or FALSE. At the launch of the app, whether to compute and show convex hulls in the 3D plot.</li>
+<li><strong>hulls.class.values</strong>: character. At the launch of the app, names of the points subsets for which to compute convex hulls.</li>
 <li><strong>plot3d.surfaces</strong>: TRUE or FALSE. At the launch of the app, whether to compute and show regression in the 3D plot.</li>
 <li><strong>plot3d.refits</strong>: TRUE or FALSE. At the launch of the app, whether to show refits on the 3D section plot.</li>
 <li><strong>point.size</strong>: integer. At the launch of the app, size of the points in the plots.</li>
@@ -829,14 +849,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="acknowledgments" class="section level1">
 <h1>Acknowledgments</h1>
-<p>The <code>archeoViz</code> application and package is developed and maintained by Sébastien Plutniak. Arthur Coulon, Solène Denis, Olivier Marlet, and Thomas Perrin tested and supported the project in its early stage. Renata Araujo, Sara Giardino, Julian Laabs, and Nicolas Delsol translated the application into Portuguese, Italian, German, and Spanish respectively.</p>
+<p>The <code>archeoViz</code> application and package is developed and maintained by Sébastien Plutniak. Arthur Coulon, Solène Denis, Olivier Marlet, and Thomas Perrin tested and supported the project in its early stage. Renata Araujo, Laura Coltofean, Sara Giardino, Julian Laabs, and Nicolas Delsol translated the application into Portuguese, Romanian, Italian, German, and Spanish respectively.</p>
 </div>
 <div id="references" class="section level1">
 <h1>References</h1>
 <div id="software" class="section level2">
 <h2>Software</h2>
 <ul>
-<li>Plutniak, Sébastien, Renata Araujo, Nicolas Delsol, Sara Giardino, Julian Laabs. 2023. “archeoViz. Visualisation, Exploration, and Web Communication of Archaeological Spatial Data”. v1.3.1, DOI: <a href="https://doi.org/10.5281/zenodo.7460193">10.5281/zenodo.7460193</a>.</li>
+<li>Plutniak, Sébastien, Renata Araujo, Laura Coltofean, Nicolas Delsol, Sara Giardino, Julian Laabs. 2023. “archeoViz. Visualisation, Exploration, and Web Communication of Archaeological Spatial Data”. v1.3.2, DOI: <a href="https://doi.org/10.5281/zenodo.7460193">10.5281/zenodo.7460193</a>.</li>
 <li>Plutniak, Sébastien, Anaïs Vignoles. 2023. “<a href="https://hal.science/hal-04156271">The archeoViz Portal: Dissemination of Spatial Archaeological Datasets</a>”, web portal, <a href="https://analytics.huma-num.fr/archeoviz/home" class="uri">https://analytics.huma-num.fr/archeoviz/home</a>.</li>
 </ul>
 </div>
@@ -852,6 +872,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <ul>
 <li>Plutniak, Sébastien. 2023. “<a href="https://hal.science/hal-04146410">Fostering the Publication of Spatial Archaeological Data: a Decentralized Approach. The archeoViz Web Application and its Portal</a>”, slides of a presentation at the University of Florida, Gainesville.</li>
 <li>Plutniak, Sébastien, Anaïs Vignoles. 2023. “<a href="https://hal.science/hal-04070444">L’application web / package archeoViz et son portail web. Une solution décentralisée d’éditorialisation de données archéologiques spatialisées</a>, slides of a presentation at the SITRADA workshop, Paris.</li>
+</ul>
+</div>
+<div id="websites" class="section level2">
+<h2>Websites</h2>
+<ul>
+<li>The <em>archeoViz. Data visualization in archaeology. Re-use, visualization, dissemination of spatial data</em> blog: <a href="https://archeoviz.hypotheses.org" class="uri">https://archeoviz.hypotheses.org</a></li>
 </ul>
 </div>
 </div>

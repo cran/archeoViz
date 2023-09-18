@@ -4,6 +4,7 @@
 
 ## bugs 
 
+* TODO vérifier que `class.variable` et `class.values` sont supportés comme para URL
 * Statistiques / le tableau "variable", lorsqu'utilisé avec "fuzzy" + "exact" modifie les rownames (ajoute des points dans les espaces)
 * bug dans la génération des svg pour les profils (les lignes qui délimitent la figure sont décalées)
 * Densité 2D : erreurs occasionnelles lorsqu'impossibilité de générer les courbes de densité
@@ -39,7 +40,11 @@
 * modifier l'interface pour clarifier que les remontages sont aussi des fabriques
 * analyse des orientations des remontages / fabrique
 * rendre possible le rearrangement des labels de carré : square_x, square_x_order, square_y, square_y_order
-* permettre de plotter les surfaces (suggestion D Giusti) ; voir tests de Gainesville avec Nico
+* permettre de plotter les surfaces (suggestion D Giusti)
+	ajouter sélecteur des sous-groupes de points pour lesquels calculer les surfaces
+		if surface == TRUE, then display <value selector>
+		TODO: reordonner les items dans le menu pour avoir le <value selector> pour les surfaces en bas
+	voir tests de Gainesville avec Nico
 * calculer des surfaces d'interface entre couches
 * étendre les paramètres possibles en URL : toute la listes des "params" + les shinyOptions.
   interfaçage / openarcheo ou nakala: faire qu'il soit possible de lancer avec une url une instance archeoviz mettant en evidence un objet.
