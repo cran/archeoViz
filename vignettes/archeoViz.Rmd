@@ -16,7 +16,8 @@ knitr::opts_chunk$set(
 
 
 
-`archeoViz` is a packaged R Shiny application for the *visualisation*, *exploration*, and web *communication* of archaeological spatial data. It includes interactive 3D and 2D *visualisations*, can generate *cross sections* and *maps* of the remains, can run basic *spatial statistics* methods (convex hull, regression surfaces, 2D kernel density estimation), and display an interactive *timeline* of an excavation. `archeoViz` can be used locally or deployed on a server, either by allowing the user to load data through the interface or by running the app with a specific data set. The app interface is available in English, French, German, Italian, Portuguese, Romanian, and Spanish.
+
+`archeoViz` is a packaged R Shiny application for the *visualisation*, *exploration*, and web *communication* of archaeological spatial data. It includes interactive 3D and 2D *visualisations*, can generate *cross sections* and *maps* of the remains, and display an interactive *timeline* of the work made in a site. Simple *spatial statistics* can be performed (convex hull, regression surfaces, 2D kernel density estimation), as well as *exporting data* to other online applications for more complex methods. `archeoViz` can be used locally or deployed on a server, either by allowing the user to load data through the interface or by running the app with a specific data set. The app interface is available in English, French, German, Italian, Portuguese, Romanian, and Spanish. Website: https://archeoviz.hypotheses.org.
 
 
 
@@ -28,6 +29,7 @@ knitr::opts_chunk$set(
 - [**Community Guidelines**](#community-guidelines)
   - [Reporting Bugs](#reporting-bugs)
   - [Suggesting Changes](#suggesting-changes)
+  - [Translation](#translation)
 - [**Use**](#use)
   - [Spatial Information in archeoViz](#spatial-information-in-archeoviz)
     - [Points, Exact Location: Plotted Objects](#points-exact-location-plotted-objects)
@@ -44,9 +46,10 @@ knitr::opts_chunk$set(
     - [Timeline Table](#timeline-table)
   - [Data Input](#data-input)
     - [Through the Application Interface](#through-the-application-interface)
-    - [Generating Random Data](#generating-random-data)
     - [Through the R Function Parameters](#through-the-r-function-parameters)
     - [Through URL Parameters](#through-url-parameters)
+    - [Generating Random Data](#generating-random-data)
+    - [Rotating the points](#rotating-the-points)
   - [Data sub-setting](#data-sub-setting)
     - [By Location Mode](#by-location-mode)
     - [By Layer or Object Category](#by-objects-category)
@@ -147,7 +150,7 @@ Demonstration instances of the application are deployed on the *Huma Num* Shiny 
 * [`archeoViz` in Spanish](https://analytics.huma-num.fr/archeoviz/es).
 * [`archeoViz` in Italian](https://analytics.huma-num.fr/archeoviz/it).
 * [`archeoViz` in Portuguese](https://analytics.huma-num.fr/archeoviz/pt).
-* [`archeoViz` in Ruman](https://analytics.huma-num.fr/archeoviz/ro).
+* [`archeoViz` in Romanian](https://analytics.huma-num.fr/archeoviz/ro).
 
 Real use cases are presented on the [*archeoViz Portal*](https://analytics.huma-num.fr/archeoviz/home).
 
@@ -162,6 +165,8 @@ Suggestions of changes to `archeoViz` are welcome.
 These requests may concern additional functions, changes to documentation, additional examples, new features, etc.
 They can be made by filling an [issue](https://github.com/sebastien-plutniak/archeoviz/issues) and, even better, using pull requests and the [GitHub Fork and Pull model](https://docs.github.com/articles/about-pull-requests).
 
+## Translation
+In the development of `archeoViz`, particular attention is paid to multilingualism. The application interface is available in several languages and translations into additional languages are welcome. To do so, please edit this [file](https://github.com/sebastien-plutniak/archeoviz/blob/main/R/load_interface_terms_utf8.R) and submit a pull request.
 
 # Use
 
@@ -297,14 +302,27 @@ A table (CSV format) can be uploaded about excavation history. Row gives the yea
 There are four ways to input data in `archeoViz`:
 
 1. uploading data tables through the “Input data” tab,
-2. generating random data in  the “Input data” tab;
-3. loading data tables through the `archeoViz` function's parameters, in the R interface;
-4. uploading data tables through URL parameters, when using an online instance of `archeoViz`.
+2. loading data tables through the `archeoViz` function's parameters, in the R interface;
+3. uploading data tables through URL parameters, when using an online instance of `archeoViz`.
+4. generating random data in  the “Input data” tab;
 
 ### Through the Application Interface
 
 The three types of tables can be loaded in the “Input data” tab.
 The CSV separator (one of: comma, semicolon, tabulation) and the character used for decimal points (period or comma).
+
+### Through URL parameters
+
+The URL of an online instance of `archeoViz` can include the parameters:
+
+* `objects.df=`
+* `refits.df=`
+* `timeline.df=`
+
+whose values must be the URL of a CSV file observing the `archeoViz` format described above.
+For example: 
+[https://analytics.huma-num.fr/archeoviz/en/?objects.df=https://zenodo.org/record/8003880/files/bilzingsleben.csv](https://analytics.huma-num.fr/archeoviz/en/?objects.df=https://zenodo.org/record/8003880/files/bilzingsleben.csv)
+
 
 
 ### Generating Random Data
@@ -327,20 +345,9 @@ archeoViz(objects.df = NULL,  # data.frame with data about the objects
           timeline.df = NULL) # optional data.frame for the excavation timeline
 ```
 
-### Through URL parameters
+### Rotating the points
 
-The URL of an online instance of `archeoViz` can include the parameters:
-
-* `objects.df=`
-* `refits.df=`
-* `timeline.df=`
-
-whose values must be the URL of a CSV file observing the `archeoViz` format described above.
-For example: 
-https://analytics.huma-num.fr/archeoviz/en/?objects.df=https://zenodo.org/record/8003880/files/bilzingsleben.csv
-
-
-
+You can change the orientation of the points in the plan. In the “Data” tab, select a value (in degrees) and click on the “Validate selection” button to confirm.
 
 ## Data Sub-setting
 
@@ -437,11 +444,19 @@ Consequently, data can be exported and imported between `archeoViz` and other we
 
 ### Export from archeoViz
 
-[*archeofrag*](https://analytics.huma-num.fr/Sebastien.Plutniak/archeofrag) is an R package and web application to assess and evaluate the distinctions betwen archaeological spatial units (e.g. layers) based on the analysis of refitting relationships between fragments of objects. The web version of the application includes methods to measure the cohesion and admixture of spatial units, and compare it to simulated data. If an instance of `archeoViz` is launched with [refitting data](#refittings), then this data can be analysed with `archeofrag` from the `Statistics` tab.
+Data can be exported to other online applications from `archeoViz` "Statistics" tab. Some exports are possible only for specific types of data or if a minimum number of values is satisfied.
+
+
+[*archeofrag*](https://analytics.huma-num.fr/Sebastien.Plutniak/archeofrag) is an R package and web application to assess and evaluate the distinctions betwen archaeological spatial units (e.g. layers) based on the analysis of refitting relationships between fragments of objects. The web version of the application includes methods to measure the cohesion and admixture of spatial units, and compare it to simulated data. If an instance of `archeoViz` is launched with [refitting data](#refittings), then this data can be analysed with `archeofrag`.
 See an example [here](https://analytics.huma-num.fr/archeoviz/grotte16).
 
-The [*Seriograph*](https://analytics.huma-num.fr/ModAthom/seriograph/) is a web application (part of the [SPARTAAS](https://spartaas.gitpages.huma-num.fr/r-package/) collection) to visualise changes in the quantitative distribution of artefacts types in ordered or unordered series of spatial units. If an online instance of `archeoViz` is launched with a data set with at least 2 different values for the `layers` variable and 2 different values for the `object_type` variable, then this data can be analysed with the `Seriograph` application from the `Statistics` tab.
+The [*Seriograph*](https://analytics.huma-num.fr/ModAthom/seriograph/) is a web application (part of the [SPARTAAS](https://spartaas.gitpages.huma-num.fr/r-package/) collection) to visualise changes in the quantitative distribution of artefacts types in ordered or unordered series of spatial units. If an online instance of `archeoViz` is launched with a data set with at least 2 different values for the `layers` variable and 2 different values for the `object_type` variable, then this data can be analysed with the `Seriograph` application.
 See an example [here](https://analytics.huma-num.fr/archeoviz/poeymau).
+
+[*Amado online*](https://app.ptm.huma-num.fr/amado/) is an on-line application for analyzing contingency tables. It is possible to export a table cross-referencing the values of the selected variable (by default, `object_type`) and the values of the variable `layer`. `Amado` allows you to manually reorder rows and columns, and perform automatic seriations and classifications. See an example [here](https://analytics.huma-num.fr/archeoviz/tai).
+
+[*explor*](https://cran.r-project.org/package=explor) is an R Shiny / R package application for interactively exploring the results of multi-dimensional analyses. `explor` has been adapted to run a Correspondence analysis on a contingency table intersecting the values of the selected variable (by default, `object_type`) and the values of the variable `layer`.  See an example [here](https://analytics.huma-num.fr/archeoviz/tai).
+
 
 ### Import to archeoViz 
 
@@ -463,7 +478,8 @@ The `archeoViz()` function can be set with multiple optional parameters, related
 ```{r, eval=FALSE}
 archeoViz(objects.df=NULL, refits.df=NULL, timeline.df=NULL,
           title=NULL, home.text=NULL, lang="en", set.theme="cosmo",
-          square.size = 100, reverse.axis.values = NULL, reverse.square.names = NULL,
+          square.size = 100, rotation = 0, grid.orientation = NULL,
+          reverse.axis.values = NULL, reverse.square.names = NULL,
           add.x.square.labels = NULL, add.y.square.labels = NULL,
           class.variable = NULL, class.values = NULL,
           default.group = "by.layer", location.mode = NULL,
@@ -487,6 +503,8 @@ archeoViz(square.size = 100,
 ```
 
 * **square.size**: numerical. Size (width and height) in centimeter of the squares in the grid system. Default value is 100 cm.
+* **rotation** : integer. Value (degrees) for the in-plane rotation of the point cloud.
+* **grid.orientation** : numerical. Orientation (degrees, positive or negative) of the grid (0 corresponds to a north orientation).
 * **reverse.axis.values**: character. Name of the axis or axes to be reversed (any combination of “x”, “y”, “z”).
 * **reverse.square.names**: character. Name of the axis or axes for which to reverse the order of the square labels (any combination of “x”, “y”, “z”).
 * **add.x.square.labels**: character. Additional square labels for the “x” axis. 
@@ -567,11 +585,11 @@ Supported parameters include:
 The parameters must be written using the URL syntax (?param1=value&param2=value2) and have the same type of values than when used in the R interface.
 For example, the following URL launches an `archeoViz` instance using the [Bilzingsleben](https://zenodo.org/record/8003880) dataset:
 
-https://analytics.huma-num.fr/archeoviz/en/?objects.df=https://zenodo.org/record/8003880/files/bilzingsleben.csv
+[https://analytics.huma-num.fr/archeoviz/en/?objects.df=https://zenodo.org/record/8003880/files/bilzingsleben.csv](https://analytics.huma-num.fr/archeoviz/en/?objects.df=https://zenodo.org/record/8003880/files/bilzingsleben.csv)
 
 This URL does the same, but also includes the refitting table (parameter `&refits.df=`) and set the activate the display of the refitting relationships in the 3D and map plots:
 
-https://analytics.huma-num.fr/archeoviz/en/?map.refits=TRUE&plot3d.refits=TRUE&objects.df=https://zenodo.org/record/8003880/files/bilzingsleben.csv&refits.df=https://zenodo.org/record/8003880/files/bilzingsleben-antlers-refits.csv
+[https://analytics.huma-num.fr/archeoviz/en/?map.refits=TRUE&plot3d.refits=TRUE&objects.df=https://zenodo.org/record/8003880/files/bilzingsleben.csv&refits.df=https://zenodo.org/record/8003880/files/bilzingsleben-antlers-refits.csv](https://analytics.huma-num.fr/archeoviz/en/?map.refits=TRUE&plot3d.refits=TRUE&objects.df=https://zenodo.org/record/8003880/files/bilzingsleben.csv&refits.df=https://zenodo.org/record/8003880/files/bilzingsleben-antlers-refits.csv)
 
 The following URL launches the Bilzingsleben dataset, pre-setting the app to: 
 
@@ -596,12 +614,12 @@ The `archeoViz` application and package is developed and maintained by Sébastie
 
 ## Software
 
-* Plutniak, Sébastien, Renata Araujo, Laura Coltofean, Nicolas Delsol, Sara Giardino, Julian Laabs. 2023. “archeoViz. Visualisation, Exploration, and Web Communication of Archaeological Spatial Data”. v1.3.2, DOI: [10.5281/zenodo.7460193](https://doi.org/10.5281/zenodo.7460193).
+* Plutniak, Sébastien, Renata Araujo, Laura Coltofean, Nicolas Delsol, Sara Giardino, Julian Laabs. 2024. “archeoViz. Visualisation, Exploration, and Web Communication of Archaeological Spatial Data”. v1.3.4, DOI: [10.5281/zenodo.7460193](https://doi.org/10.5281/zenodo.7460193).
 * Plutniak, Sébastien, Anaïs Vignoles. 2023. “[The archeoViz Portal: Dissemination of Spatial Archaeological Datasets](https://hal.science/hal-04156271)”, web portal, https://analytics.huma-num.fr/archeoviz/home.
 
 ## Papers
 
-* Plutniak, Sébastien. Submitted. “archeoViz: an R package for the Visualisation, Exploration, and Web Communication of Archaeological Spatial Data”. *Journal of Open Source Software*.
+* Plutniak, Sébastien. 2023. “archeoViz: an R package for the Visualisation, Exploration, and Web Communication of Archaeological Spatial Data”. *Journal of Open Source Software*, 92(8), 5811, DOI: [10.21105/joss.05811](https://doi.org/10.21105/joss.05811).
 * Plutniak, Sébastien. 2023. “[Visualiser et explorer la distribution spatiale du mobilier archéologique : l'application archeoViz et son portail web](https://www.prehistoire.org/offres/doc_inline_src/515/0-BSPF_2023_1_2e_partie_Correspondance_PLUTNIAK.pdf)”. *Bulletin de la Société préhistorique française*, 120(1), p. 70-74.
 
 ## Presentations

@@ -1,10 +1,10 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  # set the working directory on your shiny server:
 #  setwd(dir = "/some/path/")
 #  # download the package:
@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 #  # unzip it:
 #  unzip(zipfile = "archeoviz.zip")
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  archeoViz(objects.df = NULL,   # data.frame with data about the objects
 #            refits.df = NULL,    # optional data.frame for refitting data
 #            timeline.df = NULL,  # optional data.frame for the excavation timeline
@@ -23,18 +23,19 @@ knitr::opts_chunk$set(
 #            lang = "en"          # interface language ("de": German, "en": English, "fr": French, "it": Italian, "pt": Portuguese, "es": Spanish)
 #            set.theme = "cosmo") # graphic theme for the Shiny interface
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  archeoViz()
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  archeoViz(objects.df = NULL,  # data.frame with data about the objects
 #            refits.df = NULL,   # data.frame for refitting objects
 #            timeline.df = NULL) # optional data.frame for the excavation timeline
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  archeoViz(objects.df=NULL, refits.df=NULL, timeline.df=NULL,
 #            title=NULL, home.text=NULL, lang="en", set.theme="cosmo",
-#            square.size = 100, reverse.axis.values = NULL, reverse.square.names = NULL,
+#            square.size = 100, rotation = 0, grid.orientation = NULL,
+#            reverse.axis.values = NULL, reverse.square.names = NULL,
 #            add.x.square.labels = NULL, add.y.square.labels = NULL,
 #            class.variable = NULL, class.values = NULL,
 #            default.group = "by.layer", location.mode = NULL,
@@ -47,13 +48,13 @@ knitr::opts_chunk$set(
 #            run.plots = FALSE, html.export = TRUE, table.export = TRUE
 #            )
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  archeoViz(square.size = 100,
 #            reverse.axis.values = NULL, reverse.square.names = NULL,
 #            add.x.square.labels = NULL, add.y.square.labels = NULL
 #            )
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  archeoViz(class.variable = NULL, class.values = NULL,
 #  		  default.group = "by.layer", location.mode = NULL,
 #  		  map.z.val = NULL, map.density = "no", map.refits = NULL,
@@ -63,6 +64,6 @@ knitr::opts_chunk$set(
 #  		  camera.center = NULL, camera.eye = NULL
 #            )
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  archeoViz(run.plots = FALSE)
 

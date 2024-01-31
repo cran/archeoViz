@@ -1,8 +1,23 @@
+# archeoViz 1.3.4
+Released: 2024-01-13
+
+* Add a north arrow in the map plot, and the 'grid.orientation' parameter in the archeoViz() function to set the orientation of the grid (used to define the orientation of the north arrow for map and timeline plots).
+* Add a function to rotate the point cloud, in the 'Input' tab.
+* Fix the step value of the slider in the 'Map' tab (step = 1).
+* Add tests for the .do_r_command() and .do_square_list() functions, and the 'reverse.axis.values' parameter in the .do_section_plot() function
+
+# archeoViz 1.3.3
+Released: 2023-11-23
+
+* Add an export function to the 'expor' application for correspondance analysis.
+* Add an export function to the 'amado' application for matrix seriation.
+* grid squares dimensions are displayed on plots.
+
 # archeoViz 1.3.2
-Released: 2023-09-XX
+Released: 2023-09-17
 
 * In the 3D view, the subsets of points for which convex hulls are computed can be selected (using the graphic user interface or the 'hulls.class.values' parameter of the archeoViz() function).
-* Add linguistic support for Rumanian.
+* Add linguistic support for Romanian.
 
 # archeoViz 1.3.1
 Released: 2023-08-29

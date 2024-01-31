@@ -134,17 +134,20 @@ app_server <- function(input, output, session) {
       from.param.time.df <- utils::read.csv(url(as.character(query[['timeline.df']])))
     } else {
       from.param.time.df <- getShinyOption("timeline.df")
-    }
+    } 
     
     
     # sources priority: 
     #   function parameter > objects table > timeline table
     timeline <- .do_timelinedata(from.param.time.df, 
                                  objects.df, 
-                                 timeline.ui.df) # this is the reactive object
+                                 timeline.ui.df # this is the reactive object
+                                 )
     # notification disabled
     # showNotification(.term_switcher(timeline$notif.text),
     #                  type = timeline$notif.type)
+    if(is.null(timeline$data)){return()}
+    
     timeline$data
   })
   
@@ -214,10 +217,18 @@ app_server <- function(input, output, session) {
       objects.df <- getShinyOption("objects.df")
     }
     
+    
+    if(is.null(input$rotation)){
+      rotation.value <- getShinyOption("params")$rotation
+    } else{
+      rotation.value <- input$rotation
+    }
+    
     result <- .do_objects_dataset(
       from.parameter.input = objects.df,
       from.ui.input        = objects.ui.input,
       demoData.n           = input$demoData.n, 
+      rotation = rotation.value,
       add.x.square.labels = getShinyOption("add.x.square.labels"),
       add.y.square.labels = getShinyOption("add.y.square.labels")
     )
@@ -264,6 +275,16 @@ app_server <- function(input, output, session) {
   
   # Coordinate system ----
   
+  # : grid legend ----
+  scale.value <- getShinyOption("square.size") / 100
+  scale.unit <- " m"
+  if(scale.value < 1){
+    scale.value <- scale.value * 100
+    scale.unit <- " cm"
+  }
+  grid.legend <- paste0(.term_switcher("grid"), ": ",
+                        scale.value, " x ", scale.value, scale.unit)
+  
   # : coords min/max coordinates ----
   coords.min.max <- reactive({
     
@@ -289,27 +310,11 @@ app_server <- function(input, output, session) {
                                  coords.max = coords.min.max$ymax, 
                                  square.list = df$square_y, axes="Y")
     
-    # max.nr.of.Xsquares <- length(unique(trunc(seq(coords.min.max$xmin, coords.min.max$xmax) / square.size) * square.size)) - 1
-    # square.Xlabels <- levels(df$square_x)
-    # if(max.nr.of.Xsquares == length(square.Xlabels) ){
-    #   square_x <- square.Xlabels
-    # }  else {
-    #   message(paste0(max.nr.of.Xsquares, " X squares, but ",
-    #                  length(square.Xlabels), " X labels provided: ", 
-    #                  paste0(square.Xlabels, collapse = ", "), ".\n"))
-    # }
-    # 
-    # max.nr.of.Ysquares <- length(unique(trunc(seq(coords.min.max$ymin, coords.min.max$ymax) / square.size) * square.size)) - 1
-    # square.Ylabels <- levels(df$square_y)
-    # if(max.nr.of.Ysquares == length(square.Ylabels) ){
-    #   square_y <- square.Ylabels
-    # } else {
-    #   message(paste0(max.nr.of.Ysquares, " Y squares, but ",
-    #                  length(square.Ylabels), " Y labels provided: ", 
-    #                  paste0(square.Ylabels, collapse = ", "), ".\n"))
-    # }
-    
-    list("square_x" = squares_x, "square_y" = squares_y)
+    list("square_x" = squares_x$squares.print,
+         "square_x.save" = squares_x$squares.save,
+         "square_y" = squares_y$squares.print,
+         "square_y.save" = squares_y$squares.save
+    )
   })
   
   # : ranges ----
@@ -361,26 +366,31 @@ app_server <- function(input, output, session) {
   
   # : axis labels ----
   axis.labels <- reactive({
+    
     square.coords <- square.coords.ranges()
     square.size <- getShinyOption("square.size")
     squares <- squares()
     
     if(grepl("x", getShinyOption("reverse.square.names"))){
-      squares$square_x <-factor(squares$square_x)
-      levels(squares$square_x) <- rev(levels(squares$square_x))
+      squares$square_x <- factor(squares$square_x)
+      # levels(squares$square_x) <- rev(levels(squares$square_x))
+      squares$square_x <- factor(squares$square_x,
+                                 labels = rev(levels(squares$square_x)) )
     }
     if(grepl("y", getShinyOption("reverse.square.names"))){
-      squares$square_y <-factor(squares$square_y)
-      levels(squares$square_y) <- rev(levels(squares$square_y))
+      squares$square_y <- factor(squares$square_y)
+      # levels(squares$square_y) <- rev(levels(squares$square_y))
+      squares$square_y <- factor(squares$square_y,
+                                 labels = rev(levels(squares$square_y)) )
     }
     
     list(
       "xaxis" = list(
-        "breaks" = (square.coords$range.x + square.size / 2)[ seq_len(length(squares$square_x)) ],
+        "breaks" = (square.coords$range.x + square.size / 2)[ seq_len(length(squares$square_x.save)) ],
         "labels" =  squares$square_x
       ),
       "yaxis" = list(
-        "breaks" = (square.coords$range.y + square.size / 2)[ seq_len(length(squares$square_y)) ],
+        "breaks" = (square.coords$range.y + square.size / 2)[ seq_len(length(squares$square_y.save)) ],
         "labels" =  squares$square_y
       )
     )
@@ -570,28 +580,16 @@ app_server <- function(input, output, session) {
   timeline.map <- reactive({
     axis.labels <- axis.labels()
     
-    map.grid <- expand.grid("square_x" = axis.labels$xaxis$labels,
-                            "square_y" = axis.labels$yaxis$labels)
-    
-    # reverse squares if needed:
-    reverse <- getShinyOption("reverse.axis.values")
-    if(grepl("x", reverse)){ 
-      levels(map.grid$square_x) <- rev(levels(map.grid$square_x))
-    }
-    if(grepl("y", reverse)){ 
-      levels(map.grid$square_y) <- rev(levels(map.grid$square_y))
-    }
-    
     timeline.map <- ggplot() +
       theme_minimal(base_size = 12) +
-      geom_tile(data = map.grid,
-                aes(x = .data[["square_x"]], y = .data[["square_y"]]), alpha=0) +
-      geom_vline(xintercept =  seq(0.5, length(axis.labels$xaxis$labels) + .5, 1),
+      geom_vline(xintercept =  after_scale(seq(0.5, length(axis.labels$xaxis$breaks) + .5, 1)),
                  colour = "grey70" ) +
-      geom_hline(yintercept =  seq(0.5, length(axis.labels$yaxis$labels) + .5, 1),
+      geom_hline(yintercept =  after_scale(seq(0.5, length(axis.labels$yaxis$breaks) + .5, 1)),
                  colour = "grey70" ) +
-      coord_fixed() +
-      xlab("") + ylab("")
+      scale_fill_manual("State:",
+                        values = c(grDevices::rgb(0,0,0,0), 
+                                   grDevices::rgb(.43, .54, .23, .7))) +
+      scale_x_discrete("") + scale_y_discrete("") 
     
     timeline.map
   })   
@@ -883,6 +881,14 @@ app_server <- function(input, output, session) {
     fig <- layout(fig,
                   paper_bgcolor = getShinyOption("background.col"), 
                   plot_bgcolor =  getShinyOption("background.col"),
+                  annotations = list(list(
+                    showarrow = F,
+                    x = 0, y = 0, z = 0,
+                    text = grid.legend,
+                    xanchor = "left",
+                    xshift = 0,
+                    opacity = 1
+                  )),
                   scene = list(
                     xaxis = list(title = 'X',
                                  tickmode = "array",
@@ -956,6 +962,7 @@ app_server <- function(input, output, session) {
                      show.refits = section.x.refits,
                      colors = colors.list(),
                      grid.coord = grid.coordy(),
+                     grid.legend = grid.legend,
                      coords = coords.min.max(),
                      axis.labels = axis.labels(),
                      xaxis = "x",
@@ -1010,6 +1017,7 @@ app_server <- function(input, output, session) {
                      show.refits = section.y.refits, 
                      colors = colors.list(), 
                      grid.coord = grid.coordx(),
+                     grid.legend = grid.legend,
                      coords = coords.min.max(),
                      axis.labels = axis.labels(), 
                      xaxis = "y",
@@ -1057,10 +1065,12 @@ app_server <- function(input, output, session) {
     map.refits <- sum(c(input$map.refits,
                         getShinyOption("params")$map.refits))
     
-    do_map_plot(site.map(), planZ.df,
+    .do_map_plot(site.map(), planZ.df,
                 map.point.size, color.var, col,
                 input$map.density,
-                map.refits, refitting.df())
+                map.refits, refitting.df(),
+                grid.legend,
+                grid.orientation = getShinyOption("grid.orientation"))
     
   }, ignoreNULL = ( ! getShinyOption("run.plots"))
   )   # end eventReactive
@@ -1147,7 +1157,7 @@ app_server <- function(input, output, session) {
     sliderInput("map.z.val", "Z: min/max",  width="100%", sep = "",
                 min = min(coords$zmin, coords$zmax), 
                 max = max(coords$zmin, coords$zmax),
-                round = T,
+                step = 1, round = T,
                 value = init.values()$valuesZ
     )
   })
@@ -1190,6 +1200,7 @@ app_server <- function(input, output, session) {
   
   # : slider timeline  ----
   output$sliderTimeline <- renderUI({
+    req(timeline.data)
     time.df <- timeline.data()
     if(is.null(time.df)) return()
     
@@ -1452,12 +1463,18 @@ app_server <- function(input, output, session) {
                 value = getShinyOption("params")$point.size)
   })
   
+  # : slider rotation ----
+  output$sliderRotation <- renderUI({
+  sliderInput("rotation", .term_switcher("rotation"),
+              value = getShinyOption("params")$rotation,
+              min = -180, max = 180, step=1)
+  })
+  
   # Exports ----
   
+  # : export table   ----
   
-  # : seriograph   ----
-  
-  seriograph.table <- reactive({
+  export.table <- reactive({
     req(input$class.variable, objects.subdataset)
     
     if( (Sys.getenv('SHINY_PORT') == "") |
@@ -1475,19 +1492,75 @@ app_server <- function(input, output, session) {
   })
   
   
-  output$download.seriograph <- downloadHandler(
-    filename = "seriograph.csv",
+  # : amado   ----
+  
+  # 1) amado handler
+  output$download.amado <- downloadHandler(
+    filename = "amado.csv",
     content = function(file) {
-      write.csv(seriograph.table(), file, row.names = TRUE)
+      write.csv(export.table(), file, row.names = TRUE)
     }
   )
   
+  # 2) amado url
+  amado.url <- reactive({
+    req(export.table())
+    
+    data <- export.table()
+    
+    data <- eval(parse(text = paste0(
+      "cbind('", shiny::getShinyOption("title"), "'= rownames(data), data)"
+      )))
+    
+    data <- cbind("archeoViz" = rownames(data), data)
+    data <- rbind(colnames(data), data)
+    
+    data <- apply(data, 2, paste0, collapse="%09")   # separate cells by tabs
+    data <- gsub(" ", "%20", data)                   # add spaces
+    data <- paste0(data, collapse = "%0A")           # encode lines
+    
+    amado.lang <- "en"
+    if(getShinyOption("lang") %in% c('es', 'fr', 'it', 'ru', 'tr', 'uk', 'vi', 'zh')){
+      amado.lang <- getShinyOption("lang")
+    }
+    
+    paste0("https://app.ptm.huma-num.fr/amado/main.html?lang=", 
+           amado.lang, "&table=", data)
+  })
   
+  
+  # 3) amado download link
+  output$run.amado <- renderUI({
+    req(amado.url())
+    
+    tagList(
+      "> ", .term_switcher("export.to"),
+      actionLink("run.amado",
+                 label = "AMADO online",
+                 onclick = paste("window.open('",
+                                 amado.url(), "', '_blank')")),
+      "(", .term_switcher("download"),
+      downloadLink("download.amado", " CSV"),  ") for seriation and classification"
+    )
+  })
+  
+  
+  # : seriograph   ----
+  
+  # 1) seriograph handler
+  output$download.seriograph <- downloadHandler(
+    filename = "seriograph.csv",
+    content = function(file) {
+      write.csv(export.table(), file, row.names = TRUE)
+    }
+  )
+  
+  # 2) seriograph url
   seriograph.url <- reactive({
-    req(seriograph.table())
+    req(export.table())
     
     data.url <- session$registerDataObj(name = "table",
-                                        data = seriograph.table(),
+                                        data = export.table(),
                                         filterFunc = function(data, req) { 
                                           httpResponse(200, "text/csv",
                                                        write.csv(data, row.names = TRUE)
@@ -1505,7 +1578,7 @@ app_server <- function(input, output, session) {
   })
   
   
-  # seriograph link
+  # 3) seriograph download link
   output$run.seriograph <- renderUI({
     req(seriograph.url())
     
@@ -1516,9 +1589,59 @@ app_server <- function(input, output, session) {
                  onclick = paste("window.open('",
                                  seriograph.url(), "', '_blank')")),
       "(", .term_switcher("download"),
-      downloadLink("download.seriograph", " CSV"),  ")"
+      downloadLink("download.seriograph", " CSV"),  ") for seriation."
     )
   })
+  
+  
+  # : explor-CA   ----
+  
+  # 1) explor.ca handler
+  output$download.explor.ca <- downloadHandler(
+    filename = "explor-ca.csv",
+    content = function(file) {
+      write.csv(export.table(), file, row.names = TRUE)
+    }
+  )
+  
+  # 2) explor.ca url
+  explor.ca.url <- reactive({
+    req(export.table())
+    
+    data.url <- session$registerDataObj(name = "table",
+                                        data = export.table(),
+                                        filterFunc = function(data, req) { 
+                                          httpResponse(200, "text/csv",
+                                                       write.csv(data, row.names = TRUE)
+                                          )
+                                        })
+    object.id <- gsub(".*w=(.*)&nonce.*", "\\1", data.url)
+    
+    data.url <- paste0(session$clientData$url_protocol, "//",
+                       session$clientData$url_hostname,
+                       session$clientData$url_pathname,
+                       "_w_", object.id, 
+                       "/session/", session$token, "/download/download.seriograph")
+    
+    paste0("https://analytics.huma-num.fr/Sebastien.Plutniak/explor-ca/?data=", data.url)
+  })
+  
+  
+  # 3) explor.ca download link
+  output$run.explor.ca <- renderUI({
+    req(explor.ca.url())
+    
+    tagList(
+      "> ", .term_switcher("export.to"),
+      actionLink("run.explor.ca",
+                 label = "explor (Correspondance Analysis)",
+                 onclick = paste("window.open('",
+                                 explor.ca.url(), "', '_blank')")),
+      "(", .term_switcher("download"),
+      downloadLink("download.explor.ca", " CSV"),  ")"
+    )
+  })
+  
   
   # : archeofrag ----
   
@@ -1616,7 +1739,7 @@ app_server <- function(input, output, session) {
     if(
       ( (Sys.getenv('SHINY_PORT') != "") & # only if remote use of the app 
         ( getShinyOption("table.export")) ) &
-      ( isTruthy(seriograph.table) | isTruthy(archeofrag.tables) ) ){
+      ( isTruthy(export.table) | isTruthy(archeofrag.tables) ) ){
       h4(.term_switcher("header.export.data"))
     } else{  return() }
   })
@@ -1655,7 +1778,8 @@ app_server <- function(input, output, session) {
                             "sectionX.refits" = input$sectionX.refits,
                             "sectionY.x.val" = input$sectionY.x.val,
                             "sectionY.y.val" = input$sectionY.y.val,
-                            "sectionY.refits" = input$sectionY.refits
+                            "sectionY.refits" = input$sectionY.refits,
+                            "rotation" = input$rotation
     )
     
     .do_r_command(reactive.params, refitting.df())
@@ -1664,28 +1788,88 @@ app_server <- function(input, output, session) {
   #  Timeline ----
   #  : main timeline ----
   timeline.map.plot <- reactive({
-    
-    req(timeline.data)
-    
     time.df <- timeline.data()
-    if(is.null(time.df)) return()
     
-    # year <- input$history.date
-    # if(is.null(input$history.date)){ year <- min(time.df$year, na.rm=T)}
+    if(is.null(time.df)) return()
     
     time.sub.df <- time.df[time.df$year == input$history.date, ]
     
-    timeline.map() +
+    if(nrow(time.sub.df) == 0) return()
+    axis.labels <- axis.labels()
+
+    if("x" %in% getShinyOption("reverse.square.names")){
+      levels(time.sub.df$square_x) <- rev(levels(time.sub.df$square_x))
+    }
+    if("y" %in% getShinyOption("reverse.square.names")){
+      levels(time.sub.df$square_y) <- rev(levels(time.sub.df$square_y))
+    }
+    if("x" %in% getShinyOption("reverse.axis.values")){
+      time.sub.df$square_x <- factor(time.sub.df$square_x,
+                        levels = rev(levels(time.sub.df$square_x)))
+    }
+    if("y" %in% getShinyOption("reverse.axis.values")){
+      time.sub.df$square_y <- factor(time.sub.df$square_y,
+                          levels = rev(levels(time.sub.df$square_y)))
+    }
+    timeline.map.out <- timeline.map() +
       geom_tile(data = time.sub.df,
                 aes(x = .data[["square_x"]], y = .data[["square_y"]],
                     fill = .data[["excavation"]]),
-                show.legend = F) +
-      scale_fill_manual("State:",
-                        values = c(grDevices::rgb(0,0,0,0), 
-                                   grDevices::rgb(.43, .54, .23, .7)) )
+                show.legend = FALSE) 
+    
+    if(is.null(axis.labels$xaxis$labels)){
+      timeline.map.out <- timeline.map.out +
+        theme(axis.text.x = element_blank())
+    }
+    if(is.null(axis.labels$yaxis$labels)){
+      timeline.map.out <- timeline.map.out + 
+        theme(axis.text.y = element_blank())
+    }
+    
+    # : - add scale ----
+    timeline.map.out <- timeline.map.out +
+      annotate("text",
+               x = length(unique(time.sub.df$square_x)) / 3 ,
+               y = -0.5 ,
+               size  = 4,  
+               label = grid.legend) +
+      coord_fixed(ylim = c(1, length(unique(time.sub.df$square_y))), 
+                  clip = 'off') 
+    
+    # : - add north arrow ----
+    if( ! is.null(getShinyOption("grid.orientation"))){
+      arrow.x.origin <- length(unique(time.sub.df$square_x)) * 2/3
+      
+      arrow.coords <- matrix(c(arrow.x.origin,
+                               arrow.x.origin,
+                                0, - .5),
+                             ncol=2) 
+      
+      arrow.coords <- .rotate(coords = arrow.coords,  # rotate arrow
+                     degrees = 360 - getShinyOption("grid.orientation"),
+                     pivot = c(arrow.x.origin,
+                               median(c(arrow.coords[, 2])))
+                     )
+      
+      timeline.map.out <- timeline.map.out +
+        annotate("text",
+                 x = arrow.x.origin,
+                 y = arrow.coords[2,2] - .25, size  = 4,  
+                 label = "N") +      
+        annotate("segment",
+                 x = arrow.coords[1,1], xend = arrow.coords[2,1],
+                 y = arrow.coords[2,2], yend = arrow.coords[1,2],
+                 arrow = ggplot2::arrow(length = ggplot2::unit(0.2, "cm"))
+                 ) 
+    }
+    
+    
+    timeline.map.out
   })
   
-  output$timeline.map <- renderPlot({ timeline.map.plot() })
+  output$timeline.map <- renderPlot({
+    timeline.map.plot() 
+    })
   
   output$download.timeline.map <- downloadHandler(
     filename = "timeline-map.svg",
@@ -1702,21 +1886,31 @@ app_server <- function(input, output, session) {
     
     if(is.null(time.df)) return()
     
+    if("x" %in% getShinyOption("reverse.axis.values")){
+      time.df$square_x <- factor(time.df$square_x,
+                                     levels = rev(levels(time.df$square_x)))
+    }
+    if("y" %in% getShinyOption("reverse.axis.values")){
+      time.df$square_y <- factor(time.df$square_y,
+                                     levels = rev(levels(time.df$square_y)))
+    }
+    
     timeline.map() +
       geom_tile(data = time.df,
                 aes(x = .data[["square_x"]], y = .data[["square_y"]], 
-                    fill = .data[["excavation"]]),
-                show.legend = F)  +
-      scale_fill_manual("State:",
-                        values = c(grDevices::rgb(0, 0, 0, 0),
-                                   grDevices::rgb(.43, .54, .23, 1)) ) +
+                    fill = .data[["excavation"]]), 
+                show.legend = FALSE) +
+      coord_fixed() +
       facet_wrap(~year) +
       theme(axis.text.x = element_text(color="white", size = .1),
             axis.text.y = element_text(color="white", size = .1),
             panel.grid.major = element_blank())
   })
   
-  output$timeline.map.grid <- renderPlot({ timeline.map.grid()})
+  output$timeline.map.grid <- renderPlot({ 
+    req(timeline.map.grid)
+    timeline.map.grid()
+    })
   
   output$download.timeline.map.grid <- downloadHandler(
     filename = "timeline-map-grid.svg",
