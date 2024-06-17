@@ -1,5 +1,6 @@
 app_server <- function(input, output, session) {
   .data <- NULL
+  y <- NULL
   
   # retrieve parameters from URL ----
   observe({
@@ -193,6 +194,16 @@ app_server <- function(input, output, session) {
     refits # an empty data.frame or a list with three dataframes
   })  
   
+  # Rotation value ----
+  rotation.value <- reactive({
+    if(is.null(input$rotation)){
+        value <- getShinyOption("params")$rotation
+      } else{
+        value <- input$rotation
+      }
+    value
+  })
+  
   # Objects preprocessing: ----
   objects.file <- reactive({
     # waiting objects csv file
@@ -217,18 +228,11 @@ app_server <- function(input, output, session) {
       objects.df <- getShinyOption("objects.df")
     }
     
-    
-    if(is.null(input$rotation)){
-      rotation.value <- getShinyOption("params")$rotation
-    } else{
-      rotation.value <- input$rotation
-    }
-    
     result <- .do_objects_dataset(
       from.parameter.input = objects.df,
       from.ui.input        = objects.ui.input,
       demoData.n           = input$demoData.n, 
-      rotation = rotation.value,
+      rotation = rotation.value(),
       add.x.square.labels = getShinyOption("add.x.square.labels"),
       add.y.square.labels = getShinyOption("add.y.square.labels")
     )
@@ -276,14 +280,36 @@ app_server <- function(input, output, session) {
   # Coordinate system ----
   
   # : grid legend ----
-  scale.value <- getShinyOption("square.size") / 100
-  scale.unit <- " m"
-  if(scale.value < 1){
-    scale.value <- scale.value * 100
-    scale.unit <- " cm"
-  }
+  scale.value <- getShinyOption("square.size")  
+  user.unit <- getShinyOption("unit")
+  
+  if(user.unit == "cm"){
+    if(scale.value >= 100){
+      scale.value <- scale.value / 100
+      scale.unit <- " m"
+    } else {
+      scale.unit <- " cm"
+    }
+  } 
+  
+  if(user.unit == "m"){
+     if(scale.value >= 1000){
+       scale.value <- scale.value / 1000
+       scale.unit <- " km"
+     } else {
+       scale.unit <- " m"
+     }
+  } 
+  
+  if(user.unit == "km"){ 
+    scale.unit <- " km" 
+    }
+  
   grid.legend <- paste0(.term_switcher("grid"), ": ",
-                        scale.value, " x ", scale.value, scale.unit)
+                        scale.value, 
+                        " x ", 
+                        scale.value,
+                        scale.unit)
   
   # : coords min/max coordinates ----
   coords.min.max <- reactive({
@@ -371,15 +397,16 @@ app_server <- function(input, output, session) {
     square.size <- getShinyOption("square.size")
     squares <- squares()
     
-    if(grepl("x", getShinyOption("reverse.square.names"))){
+    reverse.x <- grepl("x", getShinyOption("reverse.square.names"))
+    reverse.y <- grepl("y", getShinyOption("reverse.square.names"))
+    
+    if(reverse.x & ! is.null(squares$square_x)){
       squares$square_x <- factor(squares$square_x)
-      # levels(squares$square_x) <- rev(levels(squares$square_x))
       squares$square_x <- factor(squares$square_x,
                                  labels = rev(levels(squares$square_x)) )
     }
-    if(grepl("y", getShinyOption("reverse.square.names"))){
+    if(reverse.y & ! is.null(squares$square_x)){
       squares$square_y <- factor(squares$square_y)
-      # levels(squares$square_y) <- rev(levels(squares$square_y))
       squares$square_y <- factor(squares$square_y,
                                  labels = rev(levels(squares$square_y)) )
     }
@@ -413,7 +440,7 @@ app_server <- function(input, output, session) {
     input.ui.refits()[1:2, ]
   }, rownames = T, digits=0)
   
-  output$refitss.preview.table <- renderUI({
+  output$refits.preview.table <- renderUI({
     div(style = 'overflow-x: scroll; overflow: auto',
         tableOutput('refits.preview.tab'))
   })
@@ -491,9 +518,9 @@ app_server <- function(input, output, session) {
       geom_hline(yintercept = square.coords$range.y, colour = "darkgrey" ) +
       coord_fixed() +
       scale_x_continuous("", breaks = axis.labels$xaxis$breaks,
-                         labels = axis.labels$xaxis$labels) +
+                             labels = axis.labels$xaxis$labels) +
       scale_y_continuous("", breaks = axis.labels$yaxis$breaks,
-                         labels = axis.labels$yaxis$labels) 
+                             labels = axis.labels$yaxis$labels) 
     
     # set background color:
     if(getShinyOption("background.col") != "white"){
@@ -508,11 +535,11 @@ app_server <- function(input, output, session) {
     # reverse axes if needed:
     reverse <- getShinyOption("reverse.axis.values")
     if(grepl("x", reverse)){ 
-      map <- map + scale_x_reverse(breaks = axis.labels$xaxis$breaks,
+      map <- map + scale_x_reverse("", breaks = axis.labels$xaxis$breaks,
                                    labels = axis.labels$xaxis$labels)
     }
     if(grepl("y", reverse)){ 
-      map <- map + scale_y_reverse(breaks = axis.labels$yaxis$breaks,
+      map <- map + scale_y_reverse("", breaks = axis.labels$yaxis$breaks,
                                    labels = axis.labels$yaxis$labels)
     }
     
@@ -580,14 +607,20 @@ app_server <- function(input, output, session) {
   timeline.map <- reactive({
     axis.labels <- axis.labels()
     
+    tiles <- expand.grid(x = axis.labels$xaxis$labels,
+                         y = axis.labels$yaxis$labels)
+    
     timeline.map <- ggplot() +
       theme_minimal(base_size = 12) +
+      geom_tile(data = tiles, 
+                aes(x = x, y = y),
+                show.legend = F, alpha=0) +
       geom_vline(xintercept =  after_scale(seq(0.5, length(axis.labels$xaxis$breaks) + .5, 1)),
                  colour = "grey70" ) +
       geom_hline(yintercept =  after_scale(seq(0.5, length(axis.labels$yaxis$breaks) + .5, 1)),
                  colour = "grey70" ) +
       scale_fill_manual("State:",
-                        values = c(grDevices::rgb(0,0,0,0), 
+                        values = c(grDevices::rgb(0,0,0,0),
                                    grDevices::rgb(.43, .54, .23, .7))) +
       scale_x_discrete("") + scale_y_discrete("") 
     
@@ -619,8 +652,9 @@ app_server <- function(input, output, session) {
       size.scale <- input$point.size
     }
     
-    # : plot initial ----
+    # : add points and create plot ----
     fig <- plot_ly(dataset, x = ~x, y = ~y, z = ~z,
+                   type = "scatter3d", mode = "markers",
                    color = ~group.variable,
                    colors = colors.list(),
                    size  = ~point.size,
@@ -642,17 +676,27 @@ app_server <- function(input, output, session) {
                   )
     )
     
-    # : add points ----
-    fig <- add_markers(fig)
+    # : add background map ----
+    
+    if( ! is.null(getShinyOption("background.map")) ){
+      fig <- add_paths(fig, x= ~x, y= ~y,
+                       z = coords$zmax,
+                       split = ~group,
+                       data = getShinyOption("background.map"),
+                       color = I("black"),
+                       hoverinfo = "skip",
+                       showlegend = FALSE, inherit = F)
+    }
     
     # : add refits lines  ----
     plot3d.refits <- sum(c(input$plot3d.refits,
                            getShinyOption("params")$plot3d.refits))
     if( plot3d.refits > 0 ){
-      refitting.df <- refitting.df()
-      refitting.df <- refitting.df$refits.3d
+      refitting.df <- refitting.df()$refits.3d
       
-      sel <- (refitting.df[, 1] %in% dataset$id) | (refitting.df[, 2] %in% dataset$id)
+      sel <- refitting.df[, 1] %in% dataset$id | 
+             refitting.df[, 2] %in% dataset$id
+      
       refitting.df <- refitting.df[which(sel), ]
       
       # add color:
@@ -675,7 +719,7 @@ app_server <- function(input, output, session) {
     
     
     # Uncertainty ----
-    if("show.uncertainty" %in% input$location){
+    if(any(input$location == "show.uncertainty")){
       
       linear.n.objects <- 0
       planar.n.objects <- 0
@@ -684,7 +728,7 @@ app_server <- function(input, output, session) {
       fuzzy.sums <- table(dataset$fuzzy.sum)
       
       # : linear uncertainty ####
-      if("1" %in% names(fuzzy.sums) ){
+      if(any(names(fuzzy.sums) == "1")){
         linear.x.df <- dataset[dataset$fuzzy.sum == 1 & dataset$x.fuzzy, ]
         if(nrow(linear.x.df) > 0){  
           linear.x.df <- .do_uncertain_lines(linear.x.df)
@@ -717,10 +761,12 @@ app_server <- function(input, output, session) {
       
       
       # : planar uncertainty----
-      if("2" %in% names(fuzzy.sums) & ! is.null(fig)){
+      if(any(names(fuzzy.sums) == "2") & ! is.null(fig)){
         # NB: the function output is the updated fig itself (and not a table)
         
         df.fuzzy2 <- dataset[dataset$fuzzy.sum == 2, ]
+        planar.n.objects <- nrow(df.fuzzy2)
+        
         planar.xz.df <- df.fuzzy2[df.fuzzy2$x.fuzzy & df.fuzzy2$z.fuzzy, ]
         planar.yz.df <- df.fuzzy2[df.fuzzy2$y.fuzzy & df.fuzzy2$z.fuzzy, ]
         planar.xy.df <- df.fuzzy2[df.fuzzy2$x.fuzzy & df.fuzzy2$y.fuzzy, ]
@@ -728,14 +774,11 @@ app_server <- function(input, output, session) {
         fig <- .do_uncertain_mesh_plans(fig, planar.xz.df, axes="xz")
         fig <- .do_uncertain_mesh_plans(fig, planar.yz.df, axes="yz")
         fig <- .do_uncertain_mesh_plans(fig, planar.xy.df, axes="xy")
-        
-        planar.n.objects <- (nrow(planar.xz.df) + nrow(planar.yz.df) +
-                               nrow(planar.xy.df)) / 4
       }
       
       
       # : add volume uncertainty ----
-      if("3" %in% names(fuzzy.sums) ){
+      if(any(names(fuzzy.sums) == "3")){
         
         volume.df <- dataset[dataset$fuzzy.sum == 3, ]
         volume.n.objects <- nrow(volume.df) 
@@ -911,7 +954,7 @@ app_server <- function(input, output, session) {
                     aspectmode = "manual", 
                     aspectratio = list(x = 1, 
                                        y = (coords$ymax - coords$ymin) / (coords$xmax - coords$xmin), 
-                                       z = ratio3D.value() * ((coords$zmax - coords$zmin) / (coords$xmax - coords$xmin)))
+                                       z = abs(ratio3D.value() * ((coords$zmax - coords$zmin) / (coords$xmax - coords$xmin))))
                   ))  #end layout
     # fig <- plotly::event_register(fig, 'plotly_click')
   }, ignoreNULL = ( ! getShinyOption("run.plots")) ) #  end plot3d
@@ -1070,6 +1113,7 @@ app_server <- function(input, output, session) {
                 input$map.density,
                 map.refits, refitting.df(),
                 grid.legend,
+                background.map = getShinyOption("background.map"),
                 grid.orientation = getShinyOption("grid.orientation"))
     
   }, ignoreNULL = ( ! getShinyOption("run.plots"))
@@ -1105,7 +1149,7 @@ app_server <- function(input, output, session) {
   
   output$ratio3D <- renderUI({
     sliderInput("ratio", .term_switcher("ratio"), width="100%", sep = "",
-                min=.5, max=2,
+                min=.1, max=2,
                 value = ratio3D.value(),
                 step=.1)
   })
@@ -1211,10 +1255,17 @@ app_server <- function(input, output, session) {
   })
   
   # : Object variable  ----
-  output$class.variable <- renderUI({
+  
+  variables.names <- reactive({
     req(objects.dataset())
-    items <- colnames(objects.dataset())[grep("object*", colnames(objects.dataset()))]
-    selectInput("class.variable", .term_switcher("variable"), choices = items,
+    colnames(objects.dataset())[grep("object*", colnames(objects.dataset()))]
+  })
+  
+  output$class.variable <- renderUI({
+    req(variables.names())
+    selectInput("class.variable",
+                .term_switcher("variable"),
+                choices = variables.names(),
                 selected = getShinyOption("params")$class.variable)
   })
   
@@ -1295,20 +1346,15 @@ app_server <- function(input, output, session) {
   output$location_choice <- renderUI({
     req(objects.dataset)
     
-    df <- objects.dataset()
-    n.location.modes <- length(unique(df$location_mode))
+    loc.values <- sort(unique(objects.dataset()$location_mode))
     
-    if(n.location.modes == 1){
-      loc.values <- c(unique(df$location_mode))
-      loc.names <-  c(.term_switcher(loc.values))
-    } else if( n.location.modes == 2) {
-      loc.values <- c("exact", "fuzzy", "show.uncertainty")
-      loc.names <- c(.term_switcher("exact"),
-                     .term_switcher("fuzzy"),
-                     .term_switcher("show.uncertainty"))
+    if(any(loc.values == "fuzzy")){
+      loc.values <- c(loc.values, "show.uncertainty")
     }
+      
+    loc.names <- sapply(loc.values, .term_switcher, USE.NAMES = F)
     
-    loc.selection <- tolower(sort(unique(df$location_mode))[1])
+    loc.selection <- loc.values[1]
     if( ! is.null(getShinyOption("params")$location)){
       loc.selection <- getShinyOption("params")$location
     }
@@ -1476,19 +1522,89 @@ app_server <- function(input, output, session) {
   
   export.table <- reactive({
     req(input$class.variable, objects.subdataset)
-    
     if( (Sys.getenv('SHINY_PORT') == "") |
-        (! getShinyOption("table.export")) ){ return() }
+        ( ! getShinyOption("table.export")) ){ return(FALSE) }
     
     dataset <- objects.subdataset()
     
-    df <- table(dataset$layer,
-                eval(parse(text = paste0("dataset$", input$class.variable))))
+    stat.variable1 <- input$stat.variable1
+    stat.variable2 <- input$stat.variable2
     
-    if(dim(df)[1] == 1 | dim(df)[2] == 1){ return() }
+    if(is.null(stat.variable1)) stat.variable1 <- "layer"
+    if(is.null(stat.variable2)) stat.variable2 <- "object_type"
+    
+    df <- table(
+      dataset[ , which(colnames(dataset) == stat.variable1)],
+      dataset[ , which(colnames(dataset) == stat.variable2)])
+    
+    if(dim(df)[1] == 1 | dim(df)[2] == 1){ return(FALSE) }
     
     df <- as.matrix(df)
     as.data.frame.matrix(df)
+  })
+  
+  # : seriograph   ----
+  
+  # 1) seriograph handler
+  output$download.seriograph <- downloadHandler(
+    filename = "seriograph.csv",
+    content = function(file) {
+      write.csv(export.table(), file, row.names = TRUE)
+    }
+  )
+  
+  # 2) seriograph links
+  output$run.seriograph <- renderUI({
+    req(export.table())
+    external_app_launch_links(table = export.table(),
+                              app.name = "seriograph", 
+                     app.url ="https://analytics.huma-num.fr/ModAthom/seriograph/?data=",
+                     methods = .term_switcher("seriations"),
+                     session = session) 
+  })
+  
+  
+  # : explor-CA   ----
+  
+  # 1) explor.ca handler
+  output$download.explor.ca <- downloadHandler(
+    filename = "explor-ca.csv",
+    content = function(file) {
+      write.csv(export.table(), file, row.names = TRUE)
+    }
+  )
+  
+  # 2)  explor.ca links
+  output$run.explor.ca <- renderUI({
+    req(export.table())
+    external_app_launch_links(table = export.table(),
+                              app.name = "explor.ca",
+                     app.url = "https://analytics.huma-num.fr/Sebastien.Plutniak/explor-ca/?data=",
+                     methods = .term_switcher("corr.analysis"),
+                     session = session)
+  })
+  
+  
+  # : shinyheatmaply   ----
+  
+  # 1) shinyheatmaply handler
+  output$download.shinyheatmaply <- downloadHandler(
+    filename = "shinyheatmaply.csv",
+    content = function(file) {
+      write.csv(export.table(), file, row.names = TRUE)
+    }
+  )
+  
+  # shinyheatmaply links
+  output$run.shinyheatmaply <- renderUI({
+    req(export.table())
+    external_app_launch_links(table = export.table(),
+                              app.name = "shinyheatmaply",
+            app.url = "https://analytics.huma-num.fr/Sebastien.Plutniak/shinyHeatmaply/?data=",
+            methods = paste0(.term_switcher("classifications"),
+                             ", ",
+                             .term_switcher("heatmaps")),
+            session = session) 
   })
   
   
@@ -1508,28 +1624,32 @@ app_server <- function(input, output, session) {
     
     data <- export.table()
     
+    data <- data[order(rownames(data)), ]
+    
+    # retrieve the name of the instance:
+    title <- shiny::getShinyOption("title")
+    if(is.null(title)){ title <- "archeoViz" }
     data <- eval(parse(text = paste0(
-      "cbind('", shiny::getShinyOption("title"), "'= rownames(data), data)"
-      )))
-    
-    data <- cbind("archeoViz" = rownames(data), data)
+      "cbind('", title, "'= rownames(data), data)"
+    )))
     data <- rbind(colnames(data), data)
-    
+
+    # recast the table as a single string:
     data <- apply(data, 2, paste0, collapse="%09")   # separate cells by tabs
     data <- gsub(" ", "%20", data)                   # add spaces
     data <- paste0(data, collapse = "%0A")           # encode lines
-    
+
+    # generate an URL:
     amado.lang <- "en"
-    if(getShinyOption("lang") %in% c('es', 'fr', 'it', 'ru', 'tr', 'uk', 'vi', 'zh')){
-      amado.lang <- getShinyOption("lang")
+    if(any(c('es', 'fr', 'it', 'ru', 'tr', 'uk', 'vi', 'zh') == shiny::getShinyOption("lang"))){
+      amado.lang <- shiny::getShinyOption("lang")
     }
-    
-    paste0("https://app.ptm.huma-num.fr/amado/main.html?lang=", 
+
+    paste0("https://app.ptm.huma-num.fr/amado/main.html?lang=",
            amado.lang, "&table=", data)
   })
-  
-  
-  # 3) amado download link
+
+
   output$run.amado <- renderUI({
     req(amado.url())
     
@@ -1539,110 +1659,14 @@ app_server <- function(input, output, session) {
                  label = "AMADO online",
                  onclick = paste("window.open('",
                                  amado.url(), "', '_blank')")),
-      "(", .term_switcher("download"),
-      downloadLink("download.amado", " CSV"),  ") for seriation and classification"
+      paste0(": ", .term_switcher("seriations"), ", ",
+             .term_switcher("classifications")),
+      "-",
+      .term_switcher("download"), downloadLink("download.amado", " CSV"),
     )
   })
   
-  
-  # : seriograph   ----
-  
-  # 1) seriograph handler
-  output$download.seriograph <- downloadHandler(
-    filename = "seriograph.csv",
-    content = function(file) {
-      write.csv(export.table(), file, row.names = TRUE)
-    }
-  )
-  
-  # 2) seriograph url
-  seriograph.url <- reactive({
-    req(export.table())
-    
-    data.url <- session$registerDataObj(name = "table",
-                                        data = export.table(),
-                                        filterFunc = function(data, req) { 
-                                          httpResponse(200, "text/csv",
-                                                       write.csv(data, row.names = TRUE)
-                                          )
-                                        })
-    object.id <- gsub(".*w=(.*)&nonce.*", "\\1", data.url)
-    
-    data.url <- paste0(session$clientData$url_protocol, "//",
-                       session$clientData$url_hostname,
-                       session$clientData$url_pathname,
-                       "_w_", object.id, 
-                       "/session/", session$token, "/download/download.seriograph")
-    
-    paste0("https://analytics.huma-num.fr/ModAthom/seriograph/?data=", data.url)
-  })
-  
-  
-  # 3) seriograph download link
-  output$run.seriograph <- renderUI({
-    req(seriograph.url())
-    
-    tagList(
-      "> ", .term_switcher("export.to"),
-      actionLink("run.seriograph",
-                 label = "Seriograph",
-                 onclick = paste("window.open('",
-                                 seriograph.url(), "', '_blank')")),
-      "(", .term_switcher("download"),
-      downloadLink("download.seriograph", " CSV"),  ") for seriation."
-    )
-  })
-  
-  
-  # : explor-CA   ----
-  
-  # 1) explor.ca handler
-  output$download.explor.ca <- downloadHandler(
-    filename = "explor-ca.csv",
-    content = function(file) {
-      write.csv(export.table(), file, row.names = TRUE)
-    }
-  )
-  
-  # 2) explor.ca url
-  explor.ca.url <- reactive({
-    req(export.table())
-    
-    data.url <- session$registerDataObj(name = "table",
-                                        data = export.table(),
-                                        filterFunc = function(data, req) { 
-                                          httpResponse(200, "text/csv",
-                                                       write.csv(data, row.names = TRUE)
-                                          )
-                                        })
-    object.id <- gsub(".*w=(.*)&nonce.*", "\\1", data.url)
-    
-    data.url <- paste0(session$clientData$url_protocol, "//",
-                       session$clientData$url_hostname,
-                       session$clientData$url_pathname,
-                       "_w_", object.id, 
-                       "/session/", session$token, "/download/download.seriograph")
-    
-    paste0("https://analytics.huma-num.fr/Sebastien.Plutniak/explor-ca/?data=", data.url)
-  })
-  
-  
-  # 3) explor.ca download link
-  output$run.explor.ca <- renderUI({
-    req(explor.ca.url())
-    
-    tagList(
-      "> ", .term_switcher("export.to"),
-      actionLink("run.explor.ca",
-                 label = "explor (Correspondance Analysis)",
-                 onclick = paste("window.open('",
-                                 explor.ca.url(), "', '_blank')")),
-      "(", .term_switcher("download"),
-      downloadLink("download.explor.ca", " CSV"),  ")"
-    )
-  })
-  
-  
+
   # : archeofrag ----
   
   archeofrag.tables <- reactive({
@@ -1722,14 +1746,15 @@ app_server <- function(input, output, session) {
     tagList(
       "> ", .term_switcher("export.to"),
       actionLink("run.archeofrag",
-                 label = "Archeofrag",
+                 label = "archeofrag",
                  onclick = paste("window.open('",
                                  archeofrag.url(), "', '_blank')")),
-      "    (", .term_switcher("download"),
+      ": ",
+      .term_switcher("refit.analysis"),
+      " - ", .term_switcher("download"),
       downloadLink("download.archeofrag.edges", " CSV-1"),
       ", ",
-      downloadLink("download.archeofrag.nodes", " CSV-2"),
-      ")"
+      downloadLink("download.archeofrag.nodes", " CSV-2")
     )
   })
   
@@ -1737,11 +1762,23 @@ app_server <- function(input, output, session) {
   # : Export ui header ----
   output$export.header <- renderUI({
     if(
-      ( (Sys.getenv('SHINY_PORT') != "") & # only if remote use of the app 
+      ( (Sys.getenv('SHINY_PORT') != "") & # only if remote use of the app
         ( getShinyOption("table.export")) ) &
       ( isTruthy(export.table) | isTruthy(archeofrag.tables) ) ){
-      h4(.term_switcher("header.export.data"))
-    } else{  return() }
+      
+      list(h4(.term_switcher("header.export.data")),
+           div(style = "display: flex;",
+           selectInput("stat.variable1",
+                       paste(.term_switcher("variable"), "1"),
+                       choices = c("layer", variables.names()),
+                       selected = "layer"), 
+           selectInput("stat.variable2",
+                       paste(.term_switcher("variable"), "2"),
+                       choices = c("layer", variables.names()),
+                       selected = "object_type")
+           )
+      )
+    } else{ return() }
   })
   
   
@@ -1779,7 +1816,7 @@ app_server <- function(input, output, session) {
                             "sectionY.x.val" = input$sectionY.x.val,
                             "sectionY.y.val" = input$sectionY.y.val,
                             "sectionY.refits" = input$sectionY.refits,
-                            "rotation" = input$rotation
+                            "rotation" = rotation.value()
     )
     
     .do_r_command(reactive.params, refitting.df())
@@ -1788,6 +1825,7 @@ app_server <- function(input, output, session) {
   #  Timeline ----
   #  : main timeline ----
   timeline.map.plot <- reactive({
+    req(input$history.date)
     time.df <- timeline.data()
     
     if(is.null(time.df)) return()
@@ -1829,16 +1867,16 @@ app_server <- function(input, output, session) {
     # : - add scale ----
     timeline.map.out <- timeline.map.out +
       annotate("text",
-               x = length(unique(time.sub.df$square_x)) / 3 ,
+               x = length(axis.labels[[1]][[1]]) / 3,
                y = -0.5 ,
                size  = 4,  
                label = grid.legend) +
-      coord_fixed(ylim = c(1, length(unique(time.sub.df$square_y))), 
+      coord_fixed(ylim = c(1, length(axis.labels[[2]][[1]])), 
                   clip = 'off') 
     
     # : - add north arrow ----
     if( ! is.null(getShinyOption("grid.orientation"))){
-      arrow.x.origin <- length(unique(time.sub.df$square_x)) * 2/3
+      arrow.x.origin <- length(axis.labels[[1]][[1]]) * 2/3
       
       arrow.coords <- matrix(c(arrow.x.origin,
                                arrow.x.origin,

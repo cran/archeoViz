@@ -1,7 +1,15 @@
+# archeoViz 1.3.5
+Released: 2024-XX-XX
+
+* New feature: archeoViz can now display a background drawing (e.g. a map outline) in '3D' and 'Map' plots, using the new 'background.map' parameter.
+* New 'unit' parameter to define the metric unit (one of: cm, m, km). The internal automatic conversion of units for the scale grid has been revised (from centimeter to meter and meter to kilometer).
+* Add an export link to the 'shinyHeatmaply' application the 'Statistics' tab.
+* Add variable selection in the 'Statistics' tab.
+
 # archeoViz 1.3.4
 Released: 2024-01-13
 
-* Add a north arrow in the map plot, and the 'grid.orientation' parameter in the archeoViz() function to set the orientation of the grid (used to define the orientation of the north arrow for map and timeline plots).
+* Add a north arrow in the map and timeline plots. The orientation of the arrow is controlled by the 'grid.orientation' parameter in the archeoViz() function.
 * Add a function to rotate the point cloud, in the 'Input' tab.
 * Fix the step value of the slider in the 'Map' tab (step = 1).
 * Add tests for the .do_r_command() and .do_square_list() functions, and the 'reverse.axis.values' parameter in the .do_section_plot() function
