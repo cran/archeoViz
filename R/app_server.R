@@ -12,7 +12,7 @@ app_server <- function(input, output, session) {
     
     # : param_static numerical and logical
     if(length(param_static) > 0){
-      for(x in 1:length(param_static)){
+      for(x in seq_len(length(param_static))){
         eval(parse(text = paste0(
           "shinyOptions(", names(param_static[x]), " = ", query[[ names(param_static[x]) ]], ")"
         )))
@@ -20,7 +20,7 @@ app_server <- function(input, output, session) {
     }
     # : param_static character
     if(length(param_static_char) > 0){
-      for(x in 1:length(param_static_char)){
+      for(x in seq_len(length(param_static_char))){
         eval(parse(text = paste0(
           "shinyOptions(", names(param_static_char[x]), " = \"",
           query[[ names(param_static_char[x]) ]], "\")"
@@ -37,13 +37,13 @@ app_server <- function(input, output, session) {
       
       # param_dynamic numerical and logical:
       if(length(param_dynamic) > 0){
-        for(x in 1:length(param_dynamic)){
+        for(x in seq_len(length(param_dynamic))){
           param.list[ names(param_dynamic[x]) ] <- param_dynamic[x]
         }
       }
       # param_dynamic character:
       if(length(param_dynamic_char) > 0){
-        for(x in 1:length(param_dynamic_char)){
+        for(x in seq_len(length(param_dynamic_char))){
           eval(parse(text = paste0(
             "param.list[ \"", names(param_dynamic_char[x]), "\"] <- \"", param_dynamic_char[x], "\""
           )))
@@ -427,7 +427,7 @@ app_server <- function(input, output, session) {
   # TABLES ----
   # : preview objects tab  ----
   output$objects.preview.tab <- renderTable({
-    objects.ui.input()[1:2, ]
+    objects.ui.input()[c(1, 2), ]
   }, rownames = T, digits=0)
   
   output$objects.preview.table <- renderUI({
@@ -437,7 +437,7 @@ app_server <- function(input, output, session) {
   
   # : preview refits tab  ----
   output$refits.preview.tab <- renderTable({
-    input.ui.refits()[1:2, ]
+    input.ui.refits()[c(1, 2), ]
   }, rownames = T, digits=0)
   
   output$refits.preview.table <- renderUI({
@@ -682,7 +682,7 @@ app_server <- function(input, output, session) {
       fig <- add_paths(fig, x= ~x, y= ~y,
                        z = coords$zmax,
                        split = ~group,
-                       data = getShinyOption("background.map"),
+                       data = data.frame(getShinyOption("background.map")),
                        color = I("black"),
                        hoverinfo = "skip",
                        showlegend = FALSE, inherit = F)
@@ -795,6 +795,10 @@ app_server <- function(input, output, session) {
         
         volume.df <- do.call("rbind", volume.df)
         
+        volume.df <- data.frame(volume.df)
+        volume.df[, c(1, 2, 3)] <- apply(volume.df[, c(1, 2, 3)], 2, as.integer) 
+        colnames(volume.df) <- c("x", "y", "z", "id", "color", "square", "object_type")
+        
         fig <- plotly::add_mesh(fig,
                                 x = volume.df[, 1],
                                 y = volume.df[, 2],
@@ -803,7 +807,7 @@ app_server <- function(input, output, session) {
                                 i = c(7, 0, 0, 0, 4, 4, 6, 6, 4, 0, 3, 2), 
                                 j = c(3, 4, 1, 2, 5, 6, 5, 2, 0, 1, 6, 3), 
                                 k = c(0, 7, 2, 3, 6, 7, 1, 1, 5, 5, 7, 6), 
-                                split = ~id,
+                                split = volume.df[, 4],
                                 facecolor = ~color,
                                 showscale = FALSE, inherit = FALSE,
                                 flatshading =TRUE, opacity = .5,
@@ -1718,7 +1722,7 @@ app_server <- function(input, output, session) {
     edges.url <- paste0(session$clientData$url_protocol, "//",
                         session$clientData$url_hostname,
                         session$clientData$url_pathname,
-                        "_w_", object.id2, 
+                        object.id2, 
                         "/session/", session$token, "/download/download.archeofrag.edges")
     
     # nodes 
@@ -1734,7 +1738,7 @@ app_server <- function(input, output, session) {
     nodes.url <- paste0(session$clientData$url_protocol, "//",
                         session$clientData$url_hostname,
                         session$clientData$url_pathname,
-                        "_w_", object.id, 
+                        object.id, 
                         "/session/", session$token, "/download/download.archeofrag.nodes")
     
     paste0("https://analytics.huma-num.fr/Sebastien.Plutniak/archeofrag/?objects=", nodes.url, "&relations=", edges.url)
@@ -1953,7 +1957,7 @@ app_server <- function(input, output, session) {
   output$download.timeline.map.grid <- downloadHandler(
     filename = "timeline-map-grid.svg",
     content = function(file) {
-      ggsave(file, plot = timeline.map.grid(),
+      ggplot2::ggsave(file, plot = timeline.map.grid(),
              device = "svg", width=9, height=9, pointsize = 14)
     }
   )

@@ -1,5 +1,13 @@
 
 
+Convexhull
+
+gMOIP::plotHull3D
+geometry::convhulln
+
+
+
+
 [![Mac OSX builds](https://github.com/geodacenter/geoda/actions/workflows/osx_build.yml/badge.svg)](https://github.com/geodacenter/geoda/actions/workflows/osx_build.yml)
 [![Ubuntu builds](https://github.com/geodacenter/geoda/actions/workflows/ubuntu_build.yml/badge.svg)](https://github.com/geodacenter/geoda/actions/workflows/ubuntu_build.yml)
 [![Windows builds](https://github.com/geodacenter/geoda/actions/workflows/windows_build.yml/badge.svg)](https://github.com/geodacenter/geoda/actions/workflows/windows_build.yml)
@@ -8,6 +16,8 @@
 
 ## Documentation
 
+* doc : https://smileipic.github.io/Smilei/ + voir chat en particulier
+* méthode: https://diataxis.fr/
 * préciser que Timeline ne fonctionne que si "square_x" et square_y" sont documentés
 * ajouter dans la doc des liens vers des exemples de tableaux de données:   
     Amalda : https://zenodo.org/doi/10.5281/zenodo.10828240 (Script & Data)
@@ -21,6 +31,18 @@
     
     Erb Tanks : https://zenodo.org/doi/10.5281/zenodo.10862997  (script)
   
+* créer tutoriels:
+    "déployer une instance sur un server Rshiny"
+    "comment simplifier l'execution d'une instance archeoviz localement"   
+        shinyShortcut   Creates an Executable Shortcut for Shiny Applications
+        
+        En windows
+            TODO Powershell?
+        En linux (et mac OS?)
+            Rscript script_archeoviz.R &
+            sleep 4
+            firefox  http://127.0.0.1:7390
+
 * reformuler la question des échelles : archeoViz ne doit plus être 'intrasite' mais scale-free 
     from the remain scale, eg. Marathousa dataset 
     to large regional scale, ex. INRAP dataset
@@ -30,34 +52,51 @@
 
 ## bugs 
 
+* Si square_x ou square_y ne peut pas être affiché, alors reverse.square.labels n'est pas appliqué en "map" view (y compris sur les labels de l'axe pour lequel les labels sont corrects)
+* si les colonnes layer, xmin, ymin, zmin sont placées après object_type, le tableau n'est pas lu correctement 
+* tab INPUT, le tableau de verification des données apres chargement montre 2 lignes (plutot que 1)
+* orientation du plan et de la chronologie sont inversées (par ex. flageolet)
+* export vers applications tierces n'est pas proposé quand il n'y a que deux variables (alors que cela devrait être le cas). par exemple : https://analytics.huma-num.fr/archeoviz/mask/
 * forcer les coordonnées comme des entiers, xmin etc.
-* Statistiques / le tableau "variable", lorsqu'utilisé avec "fuzzy" + "exact" modifie les rownames (remplace les espaces par des points)
-* bug dans la génération des svg pour les profils (les lignes qui délimitent la figure sont décalées)
-* Densité 2D : erreurs occasionnelles lorsqu'impossibilité de générer les courbes de densité
 * les coordonnées trop longs (9 chiffres) posent des pb. Hypothèse : R les formate en notation scientifique (j'ai testé : R passe en not. sc. à partir de 13 chiffers)
-* si les variables square_x et square_y n'existent pas, et que les params add.x.square.labels ou add.y.square.labels sont utilisés, les labels supplménetaires ne sont pas pris en compte
+* Statistiques / le tableau "variable", lorsqu'utilisé avec "fuzzy" + "exact" modifie les rownames (remplace les espaces par des points)
+* bug dans la génération des SVG pour les profils (les lignes qui délimitent la figure sont décalées)
+* Densité 2D : erreurs occasionnelles lorsqu'impossibilité de générer les courbes de densité
+* si les variables square_x et square_y n'existent pas, et que les params add.x.square.labels ou add.y.square.labels sont utilisés, les labels supplémentaires ne sont pas pris en compte
 * si Z n'a qu'une seule valeur, alors les carrés en vue 3D deviennent rectangulaires
+* en présence de localisation fuzzy, convexhull est inesthétique (problème d'éclairage du mesh)
+* dans les sintances génériques, les liens vers les applications tierces ne s'affichent pas
 
 ## simple enhancements
 
-* ajouter des axes en section et centrer les labels
-* indiquer sur le logo camera "plot SVG"
+* ajouter une gestion des viistes: lancement d'instance ecrit +1 dans un fichier
+* supprimer "autoscale", "lasso select", "box select"
+* permettre la sous-slection des groupes de points pour le calcul des surfaces de régression
+* remplacer reshape2 par reshape et supprimer la dépendance à reshape2
+* ajouter sliders de selection X, Y, Z dans la vue 3D
+* ajouter un test sur map.z.val (vérifiant si les valeurs sont comprises dans celles de zmin, zmax)
+* ajouter des axes en Section view et centrer les labels
+* desactiver le lasso dans plotly (+ autres options inutiles)
+* indiquer sur le logo camera "export as SVG"
 * ajouter une animation lors des chargements pour indiquer que l'application calcul
 * benchmarker archeoViz (profile pour identifer les bottlenecks)
 * ajouter le parametre square.size dans l'interface graphique
 * bouton Lancer / Rafraîchir
-* add test for: paramètre reverse.square.names
-* améliorer les labels pour les adapter lors de la représentation de grandes surfaces
+* add tests for: paramètre reverse.square.names
 * étudier le remplacement de la dépendance à knitr par xtable
+* améliorer les labels pour les adapter lors de la représentation de grandes surfaces
 * employer les données 3D "volcano"  pour voir le comportement de convex hull et reression surface pour représenter des surfaces (ex : structures en creux)
-
+* tab stat: les liens d'export ne sont pas affichés quand archeoviz executé en local (revoir pourquoi)
 
 ## new features
 
+* voir si methode pour densité 3D (genre ellipse)
+* permettre des croisements de variables  pour les densités (eg. couche & type d'objet)
+* permettre de faire des sections avec une orientation particulière (autre que X et Y)
+* permettre les enveloppes convexes en section
+* supprimer "layer / by.variable" et rendre layer la 1re option dans un menu déroulant
 * utiliser les z values pour le calcul des densités (c'est à dire faire des lignes de contours topographiques)
 * voir la possibilité d'integration des services de tiles en fonds des visualisations “Map”
-* ajouter des variables optionnelles square_x.rank et square_y.rank indiquant le rang de chaque label sur l'axe
-* clustering 3D : https://github.com/CKerouanton/ST-DBSCAN/tree/master
 * reconnaitre les donnees numeriques dans les variables object_ et les traiter comme des variables continues (plutôt que discrètes, comme c'est le cas actuellement)
 * permettre de croiser 2 variables dans les visualisations en employant couleur et symboles
 * permettre la timeline par mois ou par jours. Limite: implique une dépendance à shinyWidgets::sliderTextInput()
@@ -77,11 +116,13 @@
         timeline.df$year <- as.Date(timeline.df$year)
 * permettre de typer les relations de remontages
 * modifier l'interface pour remplacer "remontages" par le concepts de lignes (applicables aux remontages, aux fabriques, au dessin de structure)
-* analyse des orientations des remontages / fabrique
+* analyse des orientations des remontages / fabrique (reprendre McPherron)
+* clustering 3D : https://github.com/CKerouanton/ST-DBSCAN/tree/master
 * analyse statistiques 3D : 
     cf spatstat
     Baddeley_2016_analysing-spatial-point-patterns-in-R, p. 653
 * rendre possible le rearrangement des labels de carré : square_x, square_x_order, square_y, square_y_order
+* ajouter des variables optionnelles square_x.rank et square_y.rank indiquant le rang de chaque label sur l'axe
 * permettre de plotter les surfaces (suggestion D Giusti)
     ajouter sélecteur des sous-groupes de points pour lesquels calculer les surfaces
         if surface == TRUE, then display <value selector>
@@ -120,7 +161,6 @@
     * coordonnées UTM
 
 DONE:
-* voir  package explor : pour export des parametres courant d'une appli shiny
 *  récupérer l'état des paramètres
         https://stackoverflow.com/questions/32460475/export-all-user-inputs-in-a-shiny-app-to-file-and-load-them-later
     
@@ -205,12 +245,9 @@ KCSNBShiny  Naive Bayes Classifier
 
 fdapaceShiny    A Shiny App for the 'fdapace' Package
 FielDHub    A Shiny App for Design of Experiments in Life Sciences
-flipdownr   Implement a Countdown in 'RMarkdown' Documents and 'shiny' Applications
 fomantic.plus   Add Extra 'Fomantic UI' Components to 'shiny.semantic'
 formods 'Shiny' Modules for General Tasks
 FossilSimShiny  Shiny Application for 'FossilSim'
-fresh   Create Custom 'Bootstrap' Themes to Use in 'Shiny'
-gargoyle    An Event-Based Mechanism for 'Shiny'
 genTS   R Shiny App for Creating Simplified Trial Summary (TS) Domain
 GOFShiny    Interactive Document for Working with Goodness of Fit Analysis
 grapesAgri1 Collection of Shiny Apps for Agricultural Research Data Analysis
@@ -222,27 +259,22 @@ KappaGUI    An R-Shiny Application for Calculating Cohen's and Fleiss' Kappa
 KNNShiny    Interactive Document for Working with KNN Analysis
 lavaan.shiny    Latent Variable Analysis with Shiny
 lcars   LCARS Aesthetic for Shiny
-LFApp   Shiny Apps for Lateral Flow Assays
 MDSPCAShiny Interactive Document for Working with Multidimensional Scaling and Principal Component Analysis
-metathis    HTML Metadata Tags for 'R Markdown' and 'Shiny'
 MetSizeR    A Shiny App for Sample Size Estimation in Metabolomic Experiments
 mlr3shiny   Machine Learning in 'shiny' with 'mlr3'
 MNLR    Interactive Shiny Presentation for Working with Multinomial Logistic Regression
 modchart    A 'shiny' Module for Creating Charts of Various Types
-modgetxl    A 'shiny' Module for Reading Excel Sheets
 monobinShiny    Shiny User Interface for 'monobin' Package
 multiActionButton   Multi Action Button for 'Shiny' Applications
 mwshiny 'Shiny' for Multiple Windows
 netShiny    Tool for Comparison and Visualization of Multiple Networks
 nextGenShinyApps    Advanced Tools for Building the Next Generation of 'Shiny' Applications and Dashboards
-OlympicRshiny   'Shiny' Application for Olympic Data
 paramGUI    A Shiny GUI for some Parameter Estimation Examples
 PDShiny 'Probability Distribution Shiny'
 periscope   Enterprise Streamlined 'Shiny' Application Framework
 periscope2  Enterprise Streamlined 'shiny' Application Framework Using 'bs4Dash'
 PREPShiny   Interactive Document for Preprocessing the Dataset
 PROBShiny   Interactive Document for Working with Basic Probability
-prompter    Add Tooltips in 'Shiny' Apps with 'Hint.css'
 PSS.Health  Power and Sample Size for Health Researchers via Shiny
 qgshiny A 'shiny' Application for Active Learning Instruction in Introductory Quantitative Genetics
 r2resize    In-Text Resizer for Images, Tables and Fancy Resizable Containers in 'Shiny', 'Rmarkdown' and 'Quarto' Documents
@@ -256,27 +288,18 @@ radiant.multivariate    Multivariate Menu for Radiant: Business Analytics using 
 rclipboard  Shiny/R Wrapper for 'clipboard.js'
 reactlog    Reactivity Visualizer for 'shiny'
 refund.shiny    Interactive Plotting for Functional Data Analyses
-regexSelect Regular Expressions in 'shiny' Select Lists
 REPPlabShiny    'REPPlab' via a Shiny Application
-rheroicons  A Zero Dependency 'SVG' Icon Library for 'Shiny'
 rhino   A Framework for Enterprise Shiny Applications
-RInno   An Installation Framework for Shiny Apps
 rintimg View Images on Full Screen in 'RMarkdown' Documents and 'shiny' Applications
 RLumShiny   'Shiny' Applications for the R Package 'Luminescence'
-Rsconctdply Deploys Multiple 'Shiny' Apps using Configuration File
-rsconnect   Deploy Docs, Apps, and APIs to 'Posit Connect', 'shinyapps.io', and 'RPubs'
 RSP 'shiny' Applications for Statistical and Psychometric Analysis
 scenes  Switch Between Alternative 'shiny' UIs
-scrollrevealR   Animate 'shiny' Elements when They Scroll into View using the 'scrollrevealjs' Library
 semdrw  'SEM Shiny'
 sever   Customise 'Shiny' Disconnected Screens and Error Messages
 shidashi    A Shiny Dashboard Template System
-shinipsum   Lorem-Ipsum Helper Function for 'shiny' Prototyping
-shiny   Web Application Framework for R
 shiny.benchmark Benchmark the Performance of 'shiny' Applications
 shiny.blueprint Palantir's 'Blueprint' for 'Shiny' Apps
 shiny.emptystate    Empty State Components for 'Shiny'
-shiny.fluent    Microsoft Fluent UI for Shiny Apps
 shiny.router    Basic Routing for Shiny Web Applications
 shiny.semantic  Semantic UI Support for Shiny
 shiny.tailwind  'TailwindCSS' for Shiny Apps
@@ -303,12 +326,9 @@ shinyFiles  A Server-Side File System Viewer for Shiny
 shinyfilter Use Interdependent Filters on Table Columns in Shiny Apps
 shinyfullscreen Display 'HTML' Elements on Full Screen in 'Shiny' Apps
 shinyGizmo  Custom Components for Shiny Applications
-shinyglide  Glide Component for Shiny Applications
-shinyGovstyle   Custom Gov Style Inputs for Shiny
 shinyHugePlot   Efficient Plotting of Large-Sized Data
 shinyIRT    Item Response Theory Analysis with a 'shiny' Application
 ShinyItemAnalysis   Test and Item Analysis via Shiny
-shinyjqui   'jQuery UI' Interactions and Effects for Shiny
 shinyjs Easily Improve the User Experience of Your Shiny Apps in Seconds
 shinyKGode  An Interactive Application for ODE Parameter Inference Using Gradient Matching
 shinyKnobs  A Collection of Knob Inputs for 'shiny'
@@ -317,7 +337,6 @@ shinyLP Bootstrap Landing Home Pages for Shiny Applications
 shinymanager    Authentication Management for 'Shiny' Applications
 shinymaterial   Implement Material Design in Shiny Applications
 shinyMatrix Shiny Matrix Input Field
-shinymeta   Export Domain Logic from Shiny using Meta-Programming
 shinyML Compare Supervised Machine Learning Models Using Shiny App
 shinyMobile Mobile Ready 'shiny' Apps with Standalone Capabilities
 shinymodels Interactive Assessments of Models
@@ -339,8 +358,6 @@ shinyscreenshot Capture Screenshots of Entire Pages or Parts of Pages in 'Shiny'
 shinySearchbar  Shiny Searchbar - An Input Widget for Highlighting Text and More
 shinySelect A Wrapper of the 'react-select' Library
 shinyservicebot Servicebot 'Shiny' Integration
-shinyShortcut   Creates an Executable Shortcut for Shiny Applications
-shinySIR    Interactive Plotting for Mathematical Models of Infectious Disease Spread
 shinystan   Interactive Visual and Numerical Diagnostics and Posterior Analysis for Bayesian Models
 shinyStorePlus  Secure in-Browser Storage for 'Shiny' Inputs, Outputs and Variables
 shinysurveys    Create and Deploy Surveys in 'Shiny'
@@ -359,7 +376,6 @@ stmgui  Shiny Application for Creating STM Models
 stminsights A 'Shiny' Application for Inspecting Structural Topic Models
 tablerDash  'Tabler' API for 'Shiny'
 teachingApps    Apps for Teaching Statistics, R Programming, and Shiny App Development
-teal.reporter   Reporting Tools for 'shiny' Modules
 TestAnaAPP  The 'shiny' App for Test Analysis and Visualization
 tfrmtbuilder    'shiny' App Companion to the 'tfrmt' Package
 vfinputs    Visual Filter Inputs for Shiny

@@ -1,5 +1,12 @@
+
+
+# archeoViz 1.4.0
+Released: 2025-04-01
+
+* The 'cxhull' package is no longer maintained. Remove dependency to this package and replace the use of the cxhull::cxhull() and cxhull::hullMesh() functions by geometry::convhulln() to compute convex hulls.
+
 # archeoViz 1.3.5
-Released: 2024-XX-XX
+Released: 2024-06-17
 
 * New feature: archeoViz can now display a background drawing (e.g. a map outline) in '3D' and 'Map' plots, using the new 'background.map' parameter.
 * New 'unit' parameter to define the metric unit (one of: cm, m, km). The internal automatic conversion of units for the scale grid has been revised (from centimeter to meter and meter to kilometer).
