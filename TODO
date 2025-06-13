@@ -1,13 +1,5 @@
 
 
-Convexhull
-
-gMOIP::plotHull3D
-geometry::convhulln
-
-
-
-
 [![Mac OSX builds](https://github.com/geodacenter/geoda/actions/workflows/osx_build.yml/badge.svg)](https://github.com/geodacenter/geoda/actions/workflows/osx_build.yml)
 [![Ubuntu builds](https://github.com/geodacenter/geoda/actions/workflows/ubuntu_build.yml/badge.svg)](https://github.com/geodacenter/geoda/actions/workflows/ubuntu_build.yml)
 [![Windows builds](https://github.com/geodacenter/geoda/actions/workflows/windows_build.yml/badge.svg)](https://github.com/geodacenter/geoda/actions/workflows/windows_build.yml)
@@ -69,7 +61,6 @@ geometry::convhulln
 
 ## simple enhancements
 
-* ajouter une gestion des viistes: lancement d'instance ecrit +1 dans un fichier
 * supprimer "autoscale", "lasso select", "box select"
 * permettre la sous-slection des groupes de points pour le calcul des surfaces de régression
 * remplacer reshape2 par reshape et supprimer la dépendance à reshape2

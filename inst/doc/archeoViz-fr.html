@@ -14,6 +14,35 @@
 
 <title>archeoViz. Visualisation, exploration et communication web de données spatiales archéologiques</title>
 
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -35,26 +64,27 @@
   }
 </style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(title);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -63,9 +93,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -425,35 +455,35 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="locale" class="section level2">
 <h2>Locale</h2>
 <p>Le package peut être installé depuis le CRAN:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">install.packages</span>(<span class="st">&quot;archeoViz&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">install.packages</span>(<span class="st">&quot;archeoViz&quot;</span>)</span></code></pre></div>
 <p>La version de développement peut être téléchargée depuis <em>GitHub</em>:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="co"># install.packages(&quot;devtools&quot;)</span></a>
-<a class="sourceLine" id="cb2-2" title="2">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;sebastien-plutniak/archeoviz&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="co"># install.packages(&quot;devtools&quot;)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;sebastien-plutniak/archeoviz&quot;</span>)</span></code></pre></div>
 <p>Après quoi, chargez le package et lancez l’application avec:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">library</span>(archeoViz)</a>
-<a class="sourceLine" id="cb3-2" title="2"><span class="kw">archeoViz</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">library</span>(archeoViz)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="kw">archeoViz</span>()</span></code></pre></div>
 </div>
 <div id="déployée" class="section level2">
 <h2>Déployée</h2>
 <p>Pour déployer <code>archeoViz</code> sur votre Shiny server, téléchargez premièrement le package:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="co"># déterminez le répertoire de travail dans votre shiny server:</span></a>
-<a class="sourceLine" id="cb4-2" title="2"><span class="kw">setwd</span>(<span class="dt">dir =</span> <span class="st">&quot;/some/path/&quot;</span>)</a>
-<a class="sourceLine" id="cb4-3" title="3"><span class="co"># téléchargez le package:</span></a>
-<a class="sourceLine" id="cb4-4" title="4"><span class="kw">download.file</span>(<span class="dt">url =</span> <span class="st">&quot;https://github.com/sebastien-plutniak/archeoviz/archive/master.zip&quot;</span>,</a>
-<a class="sourceLine" id="cb4-5" title="5">              <span class="dt">destfile =</span> <span class="st">&quot;archeoviz.zip&quot;</span>)</a>
-<a class="sourceLine" id="cb4-6" title="6"><span class="co"># décompression:</span></a>
-<a class="sourceLine" id="cb4-7" title="7"><span class="kw">unzip</span>(<span class="dt">zipfile =</span> <span class="st">&quot;archeoviz.zip&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="co"># déterminez le répertoire de travail dans votre shiny server:</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="kw">setwd</span>(<span class="dt">dir =</span> <span class="st">&quot;/some/path/&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="co"># téléchargez le package:</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="kw">download.file</span>(<span class="dt">url =</span> <span class="st">&quot;https://github.com/sebastien-plutniak/archeoviz/archive/master.zip&quot;</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>              <span class="dt">destfile =</span> <span class="st">&quot;archeoviz.zip&quot;</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="co"># décompression:</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="kw">unzip</span>(<span class="dt">zipfile =</span> <span class="st">&quot;archeoviz.zip&quot;</span>)</span></code></pre></div>
 <p>Puis, rendez-vous à <code>https://&lt;your-shiny-server&gt;/archeoviz-main</code>.</p>
 <p>Pour paramétrer l’application avec vos données et préférences, éditez le fichier <code>app.R</code> situé à la racine du répertoire de l’application:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">archeoViz</span>(<span class="dt">objects.df =</span> <span class="ot">NULL</span>,   <span class="co"># data.frame pour les objets</span></a>
-<a class="sourceLine" id="cb5-2" title="2">          <span class="dt">refits.df =</span> <span class="ot">NULL</span>,    <span class="co"># data.frame optionnel pour les remontages</span></a>
-<a class="sourceLine" id="cb5-3" title="3">          <span class="dt">timeline.df =</span> <span class="ot">NULL</span>,  <span class="co"># data.frame optionnel pour la chronologie des fouilles</span></a>
-<a class="sourceLine" id="cb5-4" title="4">          <span class="dt">default.group =</span><span class="ot">NULL</span>, <span class="co"># méthode de groupement des données,</span></a>
-<a class="sourceLine" id="cb5-5" title="5">                               <span class="co"># par couche (&quot;by.layer&quot;) ou &quot;by.variable&quot;</span></a>
-<a class="sourceLine" id="cb5-6" title="6">          <span class="dt">title =</span> <span class="ot">NULL</span>,        <span class="co"># titre du site / du jeu de données</span></a>
-<a class="sourceLine" id="cb5-7" title="7">          <span class="dt">home.text =</span> <span class="ot">NULL</span>,    <span class="co"># contenu HTML à afficher sur la page d&#39;accueil</span></a>
-<a class="sourceLine" id="cb5-8" title="8">          <span class="dt">lang =</span> <span class="st">&quot;fr&quot;</span>          <span class="co"># langue de l&#39;interface (&quot;de&quot;: Allemand, &quot;en&quot;: Anglais, &quot;fr&quot;: Français, &quot;it&quot;: Italien &quot;pt&quot;: Portugais, &quot;es&quot;: Espagnol)</span></a>
-<a class="sourceLine" id="cb5-9" title="9">          <span class="dt">set.theme =</span> <span class="st">&quot;cosmo&quot;</span>) <span class="co"># thème graphique de l&#39;interface Shiny</span></a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">archeoViz</span>(<span class="dt">objects.df =</span> <span class="ot">NULL</span>,   <span class="co"># data.frame pour les objets</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>          <span class="dt">refits.df =</span> <span class="ot">NULL</span>,    <span class="co"># data.frame optionnel pour les remontages</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>          <span class="dt">timeline.df =</span> <span class="ot">NULL</span>,  <span class="co"># data.frame optionnel pour la chronologie des fouilles</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>          <span class="dt">default.group =</span><span class="ot">NULL</span>, <span class="co"># méthode de groupement des données,</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>                               <span class="co"># par couche (&quot;by.layer&quot;) ou &quot;by.variable&quot;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>          <span class="dt">title =</span> <span class="ot">NULL</span>,        <span class="co"># titre du site / du jeu de données</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>          <span class="dt">home.text =</span> <span class="ot">NULL</span>,    <span class="co"># contenu HTML à afficher sur la page d&#39;accueil</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>          <span class="dt">lang =</span> <span class="st">&quot;fr&quot;</span>          <span class="co"># langue de l&#39;interface (&quot;de&quot;: Allemand, &quot;en&quot;: Anglais, &quot;fr&quot;: Français, &quot;it&quot;: Italien &quot;pt&quot;: Portugais, &quot;es&quot;: Espagnol)</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a>          <span class="dt">set.theme =</span> <span class="st">&quot;cosmo&quot;</span>) <span class="co"># thème graphique de l&#39;interface Shiny</span></span></code></pre></div>
 <p>Les valeurs possibles pour le paramètre <code>set.theme</code> sont illustrées sur <a href="https://rstudio.github.io/shinythemes/">cette page</a>. La langue de l’application peut être définie avec le paramètre <code>lang</code>.</p>
 </div>
 <div id="démonstration" class="section level2">
@@ -629,11 +659,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="via-les-paramètres-de-la-fonction-r" class="section level3">
 <h3>Via les paramètres de la fonction R</h3>
 <p>La fonction de lancement d’<code>archeoViz()</code> peut être exécutée sans définir de paramètres:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">archeoViz</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">archeoViz</span>()</span></code></pre></div>
 <p>ou en employant les paramètres <code>objects.df</code>, <code>refits.df</code>, <code>timeline.df</code> afin de charger des données relatives, respectivement, aux objets, aux remontages, et à la chronologie.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">archeoViz</span>(<span class="dt">objects.df =</span> <span class="ot">NULL</span>,  <span class="co"># data.frame pour les objets</span></a>
-<a class="sourceLine" id="cb7-2" title="2">          <span class="dt">refits.df =</span> <span class="ot">NULL</span>,   <span class="co"># data.frame optionnel pour les remontages</span></a>
-<a class="sourceLine" id="cb7-3" title="3">          <span class="dt">timeline.df =</span> <span class="ot">NULL</span>) <span class="co"># data.frame optionnel pour la chronologie</span></a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="kw">archeoViz</span>(<span class="dt">objects.df =</span> <span class="ot">NULL</span>,  <span class="co"># data.frame pour les objets</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>          <span class="dt">refits.df =</span> <span class="ot">NULL</span>,   <span class="co"># data.frame optionnel pour les remontages</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>          <span class="dt">timeline.df =</span> <span class="ot">NULL</span>) <span class="co"># data.frame optionnel pour la chronologie</span></span></code></pre></div>
 </div>
 <div id="via-les-paramètres-dune-url" class="section level3">
 <h3>Via les paramètres d’une URL</h3>
@@ -756,29 +786,29 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><a href="#affichage-réactif-des-visualisations">comportement réactif</a> de l’application à propos du calcul et de l’affichage des visualisations.</li>
 <li><a href="#export-html">export HTML</a>.</li>
 </ul>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="kw">archeoViz</span>(<span class="dt">objects.df=</span><span class="ot">NULL</span>, <span class="dt">refits.df=</span><span class="ot">NULL</span>, <span class="dt">timeline.df=</span><span class="ot">NULL</span>,</a>
-<a class="sourceLine" id="cb8-2" title="2">          <span class="dt">title=</span><span class="ot">NULL</span>, <span class="dt">home.text=</span><span class="ot">NULL</span>, <span class="dt">lang=</span><span class="st">&quot;en&quot;</span>, <span class="dt">set.theme=</span><span class="st">&quot;cosmo&quot;</span>,</a>
-<a class="sourceLine" id="cb8-3" title="3">          <span class="dt">square.size =</span> <span class="dv">100</span>, <span class="dt">unit =</span> <span class="st">&quot;cm&quot;</span>, <span class="dt">rotation =</span> <span class="dv">0</span>, </a>
-<a class="sourceLine" id="cb8-4" title="4">          <span class="dt">grid.orientation =</span> <span class="ot">NULL</span>, <span class="dt">background.map =</span> <span class="ot">NULL</span>,</a>
-<a class="sourceLine" id="cb8-5" title="5">          <span class="dt">reverse.axis.values =</span> <span class="ot">NULL</span>, <span class="dt">reverse.square.names =</span> <span class="ot">NULL</span>,</a>
-<a class="sourceLine" id="cb8-6" title="6">          <span class="dt">add.x.square.labels =</span> <span class="ot">NULL</span>, <span class="dt">add.y.square.labels =</span> <span class="ot">NULL</span>,</a>
-<a class="sourceLine" id="cb8-7" title="7">          <span class="dt">class.variable =</span> <span class="ot">NULL</span>, <span class="dt">class.values =</span> <span class="ot">NULL</span>,</a>
-<a class="sourceLine" id="cb8-8" title="8">          <span class="dt">default.group =</span> <span class="st">&quot;by.layer&quot;</span>, <span class="dt">location.mode =</span> <span class="ot">NULL</span>,</a>
-<a class="sourceLine" id="cb8-9" title="9">          <span class="dt">map.z.val =</span> <span class="ot">NULL</span>, <span class="dt">map.density =</span> <span class="st">&quot;no&quot;</span>, <span class="dt">map.refits =</span> <span class="ot">NULL</span>,</a>
-<a class="sourceLine" id="cb8-10" title="10">          <span class="dt">plot3d.ratio =</span> <span class="dv">1</span>, <span class="dt">plot3d.hulls =</span> <span class="ot">FALSE</span>, <span class="dt">hulls.class.values =</span> <span class="ot">NULL</span>,</a>
-<a class="sourceLine" id="cb8-11" title="11">          <span class="dt">plot3d.surfaces =</span> <span class="ot">NULL</span>, <span class="dt">plot3d.refits =</span> <span class="ot">NULL</span>, <span class="dt">point.size =</span> <span class="dv">2</span>,</a>
-<a class="sourceLine" id="cb8-12" title="12">          <span class="dt">sectionX.x.val =</span> <span class="ot">NULL</span>, <span class="dt">sectionX.y.val =</span> <span class="ot">NULL</span>, <span class="dt">sectionX.refits =</span> <span class="ot">NULL</span>, </a>
-<a class="sourceLine" id="cb8-13" title="13">          <span class="dt">sectionY.x.val =</span> <span class="ot">NULL</span>, <span class="dt">sectionY.y.val =</span> <span class="ot">NULL</span>, <span class="dt">sectionY.refits =</span> <span class="ot">NULL</span>,</a>
-<a class="sourceLine" id="cb8-14" title="14">          <span class="dt">camera.center =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="dt">camera.eye =</span> <span class="kw">c</span>(<span class="fl">1.25</span>, <span class="fl">1.25</span>, <span class="fl">1.25</span>),</a>
-<a class="sourceLine" id="cb8-15" title="15">          <span class="dt">run.plots =</span> <span class="ot">FALSE</span>, <span class="dt">html.export =</span> <span class="ot">TRUE</span>, <span class="dt">table.export =</span> <span class="ot">TRUE</span></a>
-<a class="sourceLine" id="cb8-16" title="16">          )</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="kw">archeoViz</span>(<span class="dt">objects.df=</span><span class="ot">NULL</span>, <span class="dt">refits.df=</span><span class="ot">NULL</span>, <span class="dt">timeline.df=</span><span class="ot">NULL</span>,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>          <span class="dt">title=</span><span class="ot">NULL</span>, <span class="dt">home.text=</span><span class="ot">NULL</span>, <span class="dt">lang=</span><span class="st">&quot;en&quot;</span>, <span class="dt">set.theme=</span><span class="st">&quot;cosmo&quot;</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>          <span class="dt">square.size =</span> <span class="dv">100</span>, <span class="dt">unit =</span> <span class="st">&quot;cm&quot;</span>, <span class="dt">rotation =</span> <span class="dv">0</span>, </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a>          <span class="dt">grid.orientation =</span> <span class="ot">NULL</span>, <span class="dt">background.map =</span> <span class="ot">NULL</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a>          <span class="dt">reverse.axis.values =</span> <span class="ot">NULL</span>, <span class="dt">reverse.square.names =</span> <span class="ot">NULL</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a>          <span class="dt">add.x.square.labels =</span> <span class="ot">NULL</span>, <span class="dt">add.y.square.labels =</span> <span class="ot">NULL</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a>          <span class="dt">class.variable =</span> <span class="ot">NULL</span>, <span class="dt">class.values =</span> <span class="ot">NULL</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a>          <span class="dt">default.group =</span> <span class="st">&quot;by.layer&quot;</span>, <span class="dt">location.mode =</span> <span class="ot">NULL</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true"></a>          <span class="dt">map.z.val =</span> <span class="ot">NULL</span>, <span class="dt">map.density =</span> <span class="st">&quot;no&quot;</span>, <span class="dt">map.refits =</span> <span class="ot">NULL</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true"></a>          <span class="dt">plot3d.ratio =</span> <span class="dv">1</span>, <span class="dt">plot3d.hulls =</span> <span class="ot">FALSE</span>, <span class="dt">hulls.class.values =</span> <span class="ot">NULL</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true"></a>          <span class="dt">plot3d.surfaces =</span> <span class="ot">NULL</span>, <span class="dt">plot3d.refits =</span> <span class="ot">NULL</span>, <span class="dt">point.size =</span> <span class="dv">2</span>,</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true"></a>          <span class="dt">sectionX.x.val =</span> <span class="ot">NULL</span>, <span class="dt">sectionX.y.val =</span> <span class="ot">NULL</span>, <span class="dt">sectionX.refits =</span> <span class="ot">NULL</span>, </span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true"></a>          <span class="dt">sectionY.x.val =</span> <span class="ot">NULL</span>, <span class="dt">sectionY.y.val =</span> <span class="ot">NULL</span>, <span class="dt">sectionY.refits =</span> <span class="ot">NULL</span>,</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true"></a>          <span class="dt">camera.center =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="dt">camera.eye =</span> <span class="kw">c</span>(<span class="fl">1.25</span>, <span class="fl">1.25</span>, <span class="fl">1.25</span>),</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true"></a>          <span class="dt">run.plots =</span> <span class="ot">FALSE</span>, <span class="dt">html.export =</span> <span class="ot">TRUE</span>, <span class="dt">table.export =</span> <span class="ot">TRUE</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true"></a>          )</span></code></pre></div>
 <div id="carroyage" class="section level3">
 <h3>Carroyage</h3>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="kw">archeoViz</span>(<span class="dt">square.size =</span> <span class="dv">100</span>, <span class="dt">unit =</span> <span class="st">&quot;cm&quot;</span>, <span class="dt">rotation =</span> <span class="dv">0</span>, </a>
-<a class="sourceLine" id="cb9-2" title="2">          <span class="dt">grid.orientation =</span> <span class="ot">NULL</span>, <span class="dt">background.map =</span> <span class="ot">NULL</span>,</a>
-<a class="sourceLine" id="cb9-3" title="3">          <span class="dt">reverse.axis.values =</span> <span class="ot">NULL</span>, <span class="dt">reverse.square.names =</span> <span class="ot">NULL</span>,</a>
-<a class="sourceLine" id="cb9-4" title="4">          <span class="dt">add.x.square.labels =</span> <span class="ot">NULL</span>, <span class="dt">add.y.square.labels =</span> <span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb9-5" title="5">          )</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="kw">archeoViz</span>(<span class="dt">square.size =</span> <span class="dv">100</span>, <span class="dt">unit =</span> <span class="st">&quot;cm&quot;</span>, <span class="dt">rotation =</span> <span class="dv">0</span>, </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>          <span class="dt">grid.orientation =</span> <span class="ot">NULL</span>, <span class="dt">background.map =</span> <span class="ot">NULL</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a>          <span class="dt">reverse.axis.values =</span> <span class="ot">NULL</span>, <span class="dt">reverse.square.names =</span> <span class="ot">NULL</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>          <span class="dt">add.x.square.labels =</span> <span class="ot">NULL</span>, <span class="dt">add.y.square.labels =</span> <span class="ot">NULL</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a>          )</span></code></pre></div>
 <ul>
 <li><strong>square.size</strong> : numérique. Taille (longueur et largeur) des carrés du carroyage. La valeur par défaut est 100</li>
 <li><strong>unit</strong> : caractères. Unité pour les distances spatiales. Soit ‘cm’, ‘m’ ou ‘km’.</li>
@@ -793,14 +823,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="pré-sélection-des-paramètres" class="section level3">
 <h3>Pré-sélection des paramètres</h3>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">archeoViz</span>(<span class="dt">class.variable =</span> <span class="ot">NULL</span>, <span class="dt">class.values =</span> <span class="ot">NULL</span>,</a>
-<a class="sourceLine" id="cb10-2" title="2">          <span class="dt">default.group =</span> <span class="st">&quot;by.layer&quot;</span>, <span class="dt">location.mode =</span> <span class="ot">NULL</span>,</a>
-<a class="sourceLine" id="cb10-3" title="3">          <span class="dt">map.z.val =</span> <span class="ot">NULL</span>, <span class="dt">map.density =</span> <span class="st">&quot;no&quot;</span>, <span class="dt">map.refits =</span> <span class="ot">NULL</span>,</a>
-<a class="sourceLine" id="cb10-4" title="4">          <span class="dt">plot3d.hulls =</span> <span class="ot">NULL</span>, <span class="dt">plot3d.surfaces =</span> <span class="ot">NULL</span>, <span class="dt">plot3d.refits =</span> <span class="ot">NULL</span>,</a>
-<a class="sourceLine" id="cb10-5" title="5">          <span class="dt">sectionX.x.val =</span> <span class="ot">NULL</span>, <span class="dt">sectionX.y.val =</span> <span class="ot">NULL</span>, <span class="dt">sectionX.refits =</span> <span class="ot">NULL</span>, </a>
-<a class="sourceLine" id="cb10-6" title="6">          <span class="dt">sectionY.x.val =</span> <span class="ot">NULL</span>, <span class="dt">sectionY.y.val =</span> <span class="ot">NULL</span>, <span class="dt">sectionY.refits =</span> <span class="ot">NULL</span>,</a>
-<a class="sourceLine" id="cb10-7" title="7">          <span class="dt">camera.center =</span> <span class="ot">NULL</span>, <span class="dt">camera.eye =</span> <span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb10-8" title="8">          )</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="kw">archeoViz</span>(<span class="dt">class.variable =</span> <span class="ot">NULL</span>, <span class="dt">class.values =</span> <span class="ot">NULL</span>,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>          <span class="dt">default.group =</span> <span class="st">&quot;by.layer&quot;</span>, <span class="dt">location.mode =</span> <span class="ot">NULL</span>,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>          <span class="dt">map.z.val =</span> <span class="ot">NULL</span>, <span class="dt">map.density =</span> <span class="st">&quot;no&quot;</span>, <span class="dt">map.refits =</span> <span class="ot">NULL</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a>          <span class="dt">plot3d.hulls =</span> <span class="ot">NULL</span>, <span class="dt">plot3d.surfaces =</span> <span class="ot">NULL</span>, <span class="dt">plot3d.refits =</span> <span class="ot">NULL</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a>          <span class="dt">sectionX.x.val =</span> <span class="ot">NULL</span>, <span class="dt">sectionX.y.val =</span> <span class="ot">NULL</span>, <span class="dt">sectionX.refits =</span> <span class="ot">NULL</span>, </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a>          <span class="dt">sectionY.x.val =</span> <span class="ot">NULL</span>, <span class="dt">sectionY.y.val =</span> <span class="ot">NULL</span>, <span class="dt">sectionY.refits =</span> <span class="ot">NULL</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a>          <span class="dt">camera.center =</span> <span class="ot">NULL</span>, <span class="dt">camera.eye =</span> <span class="ot">NULL</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>          )</span></code></pre></div>
 <ul>
 <li><strong>class.variable</strong>: caractères. Au lancement de l’application, nom de la variable à pré-sélectionner.</li>
 <li><strong>class.values</strong>: caractères. Au lancement de l’application, nom des valeurs à pré-sélectionner.</li>
@@ -826,7 +856,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="affichage-réactif-des-visualisations" class="section level3">
 <h3>Affichage réactif des visualisations</h3>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw">archeoViz</span>(<span class="dt">run.plots =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="kw">archeoViz</span>(<span class="dt">run.plots =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 <ul>
 <li><strong>run.plots</strong>: TRUE ou FALSE. Si les visualisations doivent, ou non, être immédiatement calculées et affichées (sans nécessiter de cliquer sur le bouton “Rafraîchir”).</li>
 </ul>
